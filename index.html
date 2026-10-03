@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect x=%274%27 y=%2716%27 width=%276%27 height=%2712%27 fill=%27%232a78d6%27/%3E%3Crect x=%2713%27 y=%278%27 width=%276%27 height=%2720%27 fill=%27%232a78d6%27/%3E%3Crect x=%2722%27 y=%2712%27 width=%276%27 height=%2716%27 fill=%27%23eb6834%27/%3E%3C/svg%3E">
+<meta name="description" content="499 部美國片在台灣與美國的票房比對、台灣偏離預期的原因分析、Netflix 台灣 vs 全球前十名比較。">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>台美票房落差</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: one reading column (max 1180px); each section = heading + controls row + one chart; marquee-style numerals for key figures */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #16202a;
+  --muted: #5b6672;
+  --line: #dde2e8;
+  --grid: #e9edf1;
+  --point: #b9c0c8;
+  --hi: #2a78d6;
+  --hi-soft: rgba(42, 120, 214, .09);
+  --lo: #46505b;
+  --dune: #eb6834;
+  --bar: #2a78d6;
+  --theater: #eb6834;
+  --chip: #e8edf3;
+  --focus: #2a78d6;
+  --o1: #2a78d6; --o2: #eb6834; --o3: #1baf7a; --o4: #eda100; --o5: #e87ba4; --o6: #4a3aa7; --o7: #c9ccd1;
+  --f-display: "Big Shoulders Display", "Noto Sans TC", "PingFang TC", sans-serif;
+  --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151b; --surface: #171f28; --ink: #e7ecf1; --muted: #9ba7b3; --line: #2a3440; --grid: #212b36;
+    --point: #56616d; --hi: #3987e5; --hi-soft: rgba(57, 135, 229, .14); --lo: #c3ccd5; --dune: #e46a37;
+    --bar: #3987e5; --theater: #e46a37; --chip: #222d39; --focus: #6aa7f0; --o1: #3987e5; --o2: #d95926; --o3: #199e70; --o4: #c98500; --o5: #d55181; --o6: #9085e9; --o7: #4a5560; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151b; --surface: #171f28; --ink: #e7ecf1; --muted: #9ba7b3; --line: #2a3440; --grid: #212b36;
+  --point: #56616d; --hi: #3987e5; --hi-soft: rgba(57, 135, 229, .14); --lo: #c3ccd5; --dune: #e46a37;
+  --bar: #3987e5; --theater: #e46a37; --chip: #222d39; --focus: #6aa7f0; --o1: #3987e5; --o2: #d95926; --o3: #199e70; --o4: #c98500; --o5: #d55181; --o6: #9085e9; --o7: #4a5560; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; display: grid; gap: 44px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.25; }
+h1 { font-size: clamp(28px, 4.2vw, 40px); font-weight: 900; letter-spacing: .01em; }
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 16px; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+a { color: var(--hi); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+header.top { display: grid; gap: 14px; }
+.ticket { display: flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; width: fit-content; max-width: 100%; }
+.ticket > div { padding: 10px 18px; display: grid; gap: 0; border-right: 1px dashed var(--line); min-width: 0; }
+.ticket > div:last-child { border-right: 0; }
+.ticket b { font-family: var(--f-display); font-size: 30px; font-weight: 800; line-height: 1.05; letter-spacing: .01em; }
+.ticket span { font-size: 12.5px; color: var(--muted); }
+nav.jump { display: flex; flex-wrap: wrap; gap: 8px; }
+nav.jump a { text-decoration: none; color: var(--ink); background: var(--chip); padding: 5px 12px; border-radius: 999px; font-size: 13.5px; }
+nav.jump a:hover { background: var(--hi-soft); color: var(--hi); }
+
+section { display: grid; gap: 16px; scroll-margin-top: 16px; }
+.sec-head { display: grid; gap: 6px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.controls label { font-size: 13px; color: var(--muted); display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; white-space: nowrap; }
+input[type="search"], select { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+input[type="search"] { width: min(280px, 100%); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+button.chip, .seg button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 4px 11px; border-radius: 999px; cursor: pointer; }
+button.chip:hover { border-color: var(--hi); color: var(--hi); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; border-radius: 0; border-right: 1px solid var(--line); padding: 7px 14px; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+
+.explore { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .explore { grid-template-columns: minmax(0, 1fr); } }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-family: var(--f-body); font-size: 11.5px; }
+.chart .axis line, .chart .axis path { stroke: var(--line); }
+.chart .gridline { stroke: var(--grid); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.legend i.ring { background: transparent !important; border: 1.5px solid var(--point); }
+.legend i.sq { border-radius: 2px; }
+.legend i.ln { height: 2px; width: 14px; border-radius: 0; vertical-align: 3px; }
+
+.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; line-height: 1.5; box-shadow: 0 6px 18px rgba(0,0,0,.12); max-width: 260px; z-index: 5; }
+.tip b { font-size: 13.5px; }
+.tip .row { display: flex; justify-content: space-between; gap: 14px; }
+
+.card { display: grid; gap: 10px; }
+.card .ratio { font-family: var(--f-display); font-size: 54px; font-weight: 800; line-height: 1; }
+.card dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; font-size: 13.5px; }
+.card dt { color: var(--muted); }
+.card dd { margin: 0; text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 999px; font-weight: 500; width: fit-content; }
+.pill.hi { background: var(--hi-soft); color: var(--hi); }
+.pill.mid { background: var(--chip); color: var(--muted); }
+.pill.lo { background: var(--chip); color: var(--lo); }
+.scale { position: relative; height: 26px; }
+.scale .track { position: absolute; top: 11px; left: 0; right: 0; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--chip) 0%, var(--chip) 100%); }
+.scale .band { position: absolute; top: 9px; height: 8px; background: var(--hi-soft); border-radius: 4px; }
+.scale .mark { position: absolute; top: 4px; width: 3px; height: 18px; border-radius: 2px; background: var(--ink); transform: translateX(-1px); }
+.scale .dmark { position: absolute; top: 7px; width: 10px; height: 10px; border-radius: 50%; background: var(--dune); transform: translateX(-5px); border: 2px solid var(--surface); }
+.scale-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 640px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+th { font-weight: 500; color: var(--muted); font-size: 12.5px; white-space: nowrap; cursor: pointer; user-select: none; }
+th[aria-sort="descending"]::after { content: " ▾"; }
+th[aria-sort="ascending"]::after { content: " ▴"; }
+td.r, th.r { text-align: right; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--hi-soft); }
+tr.is-dune td:first-child { box-shadow: inset 3px 0 0 var(--dune); }
+.en { color: var(--muted); font-size: 12px; display: block; }
+.rbar { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.rbar .b { position: relative; width: 110px; height: 8px; background: var(--chip); border-radius: 4px; flex: none; }
+.rbar .b span { position: absolute; top: 0; height: 8px; border-radius: 4px; }
+.rbar .b::after { content: ""; position: absolute; left: 50%; top: -3px; width: 1px; height: 14px; background: var(--muted); opacity: .6; }
+
+.weeks-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .weeks-grid { grid-template-columns: minmax(0, 1fr); } }
+.cmp td, .cmp th { padding: 6px 8px; font-size: 13px; }
+.cmp { min-width: 0; }
+.cmp th { cursor: default; }
+.cmp tr.on td { background: var(--hi-soft); }
+.note { font-size: 13px; color: var(--muted); }
+.why-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .why-grid { grid-template-columns: minmax(0, 1fr); } }
+.why-grid .panel { display: grid; gap: 10px; align-content: start; }
+.finding { font-size: 14px; }
+.verdict { font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 999px; width: fit-content; }
+.verdict.yes { background: var(--hi-soft); color: var(--hi); }
+.verdict.part { background: var(--chip); color: var(--ink); }
+.verdict.no { background: var(--chip); color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+.hbars { display: grid; gap: 5px; }
+.hb { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 4.2em; gap: 8px; align-items: center; font-size: 13px; }
+.hb .lab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hb .lab small { color: var(--muted); font-size: 11px; margin-left: 4px; }
+.hb .track { position: relative; height: 12px; background: var(--chip); border-radius: 3px; }
+.hb .track span { position: absolute; top: 0; height: 12px; border-radius: 3px; }
+.hb .track.div::after { content: ""; position: absolute; left: 50%; top: -3px; width: 1px; height: 18px; background: var(--muted); opacity: .7; }
+.hb .v { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.ladder { display: grid; gap: 6px; }
+.ladder .hb { grid-template-columns: 8.5em minmax(0, 1fr) 3.4em; }
+.people { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 520px) { .people { grid-template-columns: minmax(0, 1fr); } }
+.people ol { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; font-size: 13px; }
+.people li span { font-family: var(--f-mono); font-variant-numeric: tabular-nums; color: var(--muted); margin-left: 4px; }
+.people li small { display: block; color: var(--muted); font-size: 11.5px; line-height: 1.4; }
+.wide { grid-column: 1 / -1; }
+.stack { display: grid; gap: 7px; }
+.srow { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px; align-items: center; font-size: 13px; }
+.srow.me .lab { font-weight: 700; }
+.sbar { display: flex; height: 22px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--surface); }
+.sbar span { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-family: var(--f-mono); min-width: 0; overflow: hidden; white-space: nowrap; }
+.sbar span.o7 { color: var(--ink); }
+.hb.me .lab { font-weight: 700; color: var(--ink); }
+.mini { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; font-size: 13px; }
+.mini li span { color: var(--muted); font-family: var(--f-mono); font-variant-numeric: tabular-nums; margin-left: 4px; font-size: 12px; }
+.tag { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 4px; background: var(--chip); color: var(--muted); margin-left: 4px; }
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .three { grid-template-columns: minmax(0, 1fr); } }
+ul.method { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 80ch; font-size: 14px; }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">影視幕後的商業運作 · 作業一延伸</div>
+    <h1>台美票房落差</h1>
+    <p class="muted">同一部好萊塢片，在台灣和美國的票房表現可能完全不同。這裡把 2016 年 6 月以來在台灣上映、票房破千萬的美國片，與 Box Office Mojo 的美國本土票房逐一比對，算出每部片「在台灣比預期多賣或少賣幾倍」。</p>
+    <div class="ticket" aria-label="重點數字">
+      <div><b class="num" id="k-n">499</b><span>部美國片</span></div>
+      <div><b id="k-dune">×1.95</b><span>《沙丘：第二部》實際÷預期</span></div>
+      <div><b id="k-top">×8.6</b><span>《氣象戰》台灣超常表現</span></div>
+      <div><b id="k-r2">0.38</b><span>美國票房的解釋力（R²）</span></div>
+    </div>
+    <nav class="jump" aria-label="章節">
+      <a href="#explore">散佈圖</a><a href="#rank">排行榜</a><a href="#why">為什麼會偏離</a><a href="#netflix">Netflix 台灣 vs 全球</a><a href="#weeks">週票房的定義</a><a href="#ctd">臥虎藏龍</a><a href="#method">計算方式</a><a href="#data">下載資料</a>
+    </nav>
+  </header>
+
+  <section id="explore">
+    <div class="sec-head">
+      <h2>美國賣多少，台灣「應該」賣多少？</h2>
+      <p class="muted">每個點是一部片。藍線是依美國票房推算的台灣預期票房，淺藍帶是 ±1 個標準差（約 0.42–2.38 倍）。落在帶子上方的片，台灣表現明顯比同規模的片好。滑過點看數字，點一下看詳細比較。</p>
+    </div>
+    <div class="controls">
+      <label for="q">找片 <input type="search" id="q" list="names" placeholder="輸入中文或英文片名"></label>
+      <datalist id="names"></datalist>
+      <label for="y0">上映年份 <select id="y0"></select> 至 <select id="y1"></select></label>
+      <label for="cv"><input type="checkbox" id="cv" checked> 顯示疫情期上映的片</label>
+    </div>
+    <div class="chips" id="presets" aria-label="快速選片"></div>
+    <div class="explore">
+      <div class="panel">
+        <div class="chart" id="scatter"></div>
+        <div class="legend" style="margin-top:8px">
+          <span><i style="background:var(--hi)"></i>台灣明顯偏強（＞+1 標準差）</span>
+          <span><i style="background:var(--lo)"></i>台灣明顯偏弱（＜−1 標準差）</span>
+          <span><i style="background:var(--point)"></i>正常範圍</span>
+          <span><i class="ring"></i>疫情期（不參與預期值估計）</span>
+          <span><i style="background:var(--dune)"></i>沙丘：第二部</span>
+        </div>
+      </div>
+      <aside class="panel card" id="detail" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section id="rank">
+    <div class="sec-head">
+      <h2>排行榜</h2>
+      <p class="muted">依「台灣實際 ÷ 預期」排序。中間的直線代表 1 倍（剛好符合預期），往右越長代表台灣越超常。點一列就會在散佈圖上選取這部片。</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="排行模式">
+        <button type="button" data-mode="hi" aria-pressed="true">台灣偏強</button>
+        <button type="button" data-mode="lo" aria-pressed="false">台灣偏弱</button>
+        <button type="button" data-mode="big" aria-pressed="false">台灣破億的片</button>
+      </div>
+      <label for="tq">篩選 <input type="search" id="tq" placeholder="片名關鍵字"></label>
+      <span class="note" id="tcount"></span>
+    </div>
+    <div class="panel tablewrap">
+      <table id="rtable">
+        <thead><tr>
+          <th data-k="rank" class="r">#</th><th data-k="zh">片名</th><th data-k="rel">台灣上映</th>
+          <th data-k="tw" class="r">台灣票房</th><th data-k="us" class="r">美國本土</th><th data-k="r" class="r">實際 ÷ 預期</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="sec-head">
+      <h2>為什麼有些片在台灣特別好（或特別差）？</h2>
+      <p class="muted" id="why-intro"></p>
+    </div>
+    <div class="why-grid">
+      <div class="panel wide">
+        <h3>每加入一個因素，能解釋多少台灣票房的差異（R²）</h3>
+        <div class="ladder hbars" id="w-ladder"></div>
+        <p class="note">最大的一步是「海外票房占比」：一部片在美國以外的世界賣得越好，台灣通常也越好。台灣偏離預期，多半是因為<b>美國本身是特例</b>，而不是台灣口味特別。</p>
+      </div>
+      <div class="panel">
+        <span class="verdict yes">成立</span>
+        <h3>類型：大場面加分，美式喜劇、家庭片扣分</h3>
+        <div class="hbars" id="w-genre"></div>
+        <p class="note">各類型「實際 ÷ 預期」的中位數，中線是 ×1。依 IMDb 類型，一部片可屬多個類型。</p>
+      </div>
+      <div class="panel">
+        <span class="verdict yes">成立</span>
+        <h3>台灣跟著香港、新加坡走，跟英國、澳洲無關</h3>
+        <div class="hbars" id="w-market"></div>
+        <p class="note">每個市場自己「比美國多賣或少賣」的程度，與台灣的相關係數。台灣偏強組的海外票房占比中位數 <b class="num" id="w-fs-hi"></b>，偏弱組只有 <b class="num" id="w-fs-lo"></b>。</p>
+      </div>
+      <div class="panel">
+        <span class="verdict yes">成立</span>
+        <h3>明星與導演：有些名字在台灣特別賣</h3>
+        <div class="people">
+          <div><div class="eyebrow">台灣偏強的演員</div><ol id="w-act-hi"></ol></div>
+          <div><div class="eyebrow">台灣偏弱的演員</div><ol id="w-act-lo"></ol></div>
+        </div>
+        <p class="note" id="w-star-note"></p>
+      </div>
+      <div class="panel">
+        <span class="verdict part">成立，但與類型交織</span>
+        <h3>上映時間：比美國晚上映的片吃虧</h3>
+        <p class="note" style="margin:0">台灣相對美國的上映日</p>
+        <div class="hbars" id="w-gap"></div>
+        <p class="note">晚上映的多半是頒獎季劇情片、動畫或歌舞片，類型本身就偏弱，所以這個效果有一部分是類型造成的。</p>
+      </div>
+      <div class="panel">
+        <span class="verdict yes">成立</span>
+        <h3>製作規模：台灣對大製作的反應比美國強</h3>
+        <p class="finding" id="w-budget"></p>
+        <div class="eyebrow" style="margin-top:4px">導演</div>
+        <div class="people">
+          <div><div class="eyebrow">偏強</div><ol id="w-dir-hi"></ol></div>
+          <div><div class="eyebrow">偏弱</div><ol id="w-dir-lo"></ol></div>
+        </div>
+      </div>
+      <div class="panel">
+        <span class="verdict no">不成立</span>
+        <h3>「台灣觀眾比較不看評價」</h3>
+        <p class="finding" id="w-rating"></p>
+        <div class="eyebrow" style="margin-top:4px">好萊塢在台灣逐年變弱（各年中位倍數）</div>
+        <div class="hbars" id="w-year"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="netflix">
+    <div class="sec-head">
+      <div class="eyebrow">延伸：串流</div>
+      <h2>Netflix 上，台灣人看的跟全世界一樣嗎？</h2>
+      <p class="muted" id="nf-intro"></p>
+    </div>
+    <div class="why-grid">
+      <div class="panel">
+        <h3>台灣是全球第 <span class="num" id="nf-rank"></span> 「在地」的 Netflix 市場</h3>
+        <div class="hbars" id="nf-overlap"></div>
+        <p class="note">每週前十名中，有多少也出現在 Netflix 全球前十名（英語＋非英語）。比例越低，代表這個市場的口味越獨立。</p>
+      </div>
+      <div class="panel">
+        <h3>台灣的榜單最像香港與東南亞，最不像美國</h3>
+        <div class="hbars" id="nf-sim"></div>
+        <p class="note">每週兩國前十名重疊的程度（Jaccard 相似度，0＝完全不同、1＝完全相同）的平均。院線票房也呈現同樣的結果。</p>
+      </div>
+      <div class="panel wide">
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+          <h3>前十名的內容來自哪裡</h3>
+          <div class="seg" role="group" aria-label="類別" id="nf-seg">
+            <button type="button" data-k="comp_tv" aria-pressed="true">影集</button>
+            <button type="button" data-k="comp_films" aria-pressed="false">電影</button>
+          </div>
+        </div>
+        <div class="stack" id="nf-comp"></div>
+        <div class="legend" id="nf-legend"></div>
+        <p class="note">每週前十名「上榜次數」的來源比例。來源依 Wikidata 的出品國與原始語言判定；「其他」含無法辨識的片（台灣約占 11–17%）。</p>
+      </div>
+      <div class="panel">
+        <h3>台灣的影集口味：韓劇退燒、日本動畫崛起</h3>
+        <div class="chart" id="nf-trend"></div>
+        <div class="legend" id="nf-trend-legend"></div>
+      </div>
+      <div class="panel">
+        <h3>院線在台灣賣得好，上 Netflix 也待得久</h3>
+        <div class="chart" id="nf-theat"></div>
+        <p class="note" id="nf-theat-note"></p>
+      </div>
+      <div class="panel wide">
+        <div class="three">
+          <div><div class="eyebrow">只紅在台灣（從未上全球榜）</div><ol class="mini" id="nf-local"></ol></div>
+          <div><div class="eyebrow">在台灣待得比全球久</div><ol class="mini" id="nf-longer"></ol></div>
+          <div><div class="eyebrow">全球大熱、台灣從未上榜</div><ol class="mini" id="nf-missed"></ol></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>好萊塢片多久才上台灣 Netflix 榜？看片商</h3>
+        <div class="hbars" id="nf-lag"></div>
+        <p class="note">台灣院線上映到第一次進台灣 Netflix 前十名的天數中位數（灰字為片數）。索尼的片約 4 個月就出現在 Netflix 榜上；派拉蒙、環球、華納要將近兩年，華納的片會先在自家 Max 上架。</p>
+      </div>
+      <div class="panel">
+        <h3>台灣作品在國外：主要賣到華語與東南亞</h3>
+        <p class="finding" id="nf-twc"></p>
+        <ol class="mini" id="nf-twc-top"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="weeks">
+    <div class="sec-head">
+      <h2>《沙丘：第二部》：「一週」怎麼切，結論就不同</h2>
+      <p class="muted">台灣系統的週是週一到週日，但本片 2/28（週三）上映，官方第一週只有 5 天，加上 2/27 預映。改成「從上映日起算的完整 7 天」後，台灣的首週占比和第二週跌幅都跟美國幾乎一樣。</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="週定義" id="wseg">
+        <button type="button" data-w="us" aria-pressed="false">美國（週五至週四）</button>
+        <button type="button" data-w="tw_b" aria-pressed="true">台灣官方（週一至週日）</button>
+        <button type="button" data-w="tw_c" aria-pressed="false">台灣重整（上映日起 7 天）</button>
+        <button type="button" data-w="tw_fri" aria-pressed="false">台灣硬套週五至週四</button>
+      </div>
+    </div>
+    <div class="weeks-grid">
+      <div class="panel">
+        <h3 id="wtitle" style="margin-bottom:6px"></h3>
+        <div class="chart" id="wchart"></div>
+        <div class="legend" style="margin-top:6px">
+          <span><i class="sq" style="background:var(--bar)"></i>週票房</span>
+          <span><i class="ln" style="background:var(--theater)"></i>戲院數</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:8px">四種週定義的比較</h3>
+        <table class="cmp" id="cmp">
+          <thead><tr><th></th><th class="r">第1週</th><th class="r">第2週變動</th><th class="r">首週占比</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="note" style="margin-top:10px">官方定義把第一週的 3/4、3/5 兩天（約 1,197 萬元）算進第二週，所以第二週跌幅只有 −28.5%，看起來比實際穩。硬套「週五至週四」則讓第一週變成 9 天，第二週跌幅又被放大。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="ctd">
+    <div class="sec-head">
+      <h2>《臥虎藏龍》：平台式發行的另一種曲線</h2>
+      <p class="muted">2000/12/8 只在 16 家戲院上映，隨金球獎、奧斯卡提名與頒獎逐步擴映到 2,027 家。大片的戲院數和票房從第一週一路往下，這部片則是戲院數先爬升，票房出現多個高峰。</p>
+    </div>
+    <div class="panel">
+      <div class="chart" id="cchart"></div>
+      <div class="legend" style="margin-top:6px">
+        <span><i class="sq" style="background:var(--bar)"></i>週票房（百萬美元）</span>
+        <span><i class="ln" style="background:var(--theater)"></i>戲院數</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <div class="sec-head"><h2>計算方式</h2></div>
+    <ul class="method">
+      <li><b>資料來源：</b>台灣票房取自全國電影票房統計資訊系統（國別＝美國、台灣累計票房 ≥ NT$1,000 萬），美國本土票房取自 Box Office Mojo 年度全球票房表，皆擷取於 2026/10/2。</li>
+      <li><b>預期值：</b>對數迴歸 <span class="num" id="m-eq"></span>（台灣票房以 1 美元 = 32 台幣換算）。只用非疫情期的片估計（2020/3–2021/12 上映者不參與）。</li>
+      <li><b>實際 ÷ 預期：</b>大於 1 代表台灣比同規模的美國片賣得好。殘差標準差約 <span class="num" id="m-sd"></span>，所以 0.42–2.38 倍之間都算正常波動。</li>
+      <li><b>資料清理：</b>系統從 2016 年 6 月起才有完整資料，之前的片不列入；排除重映版、台灣合拍片，以及 Mojo 沒有美國院線票房的片（例如《花木蘭》）。</li>
+      <li><b>偏離原因的資料：</b>類型、評分與演員導演來自 IMDb 官方非商業資料集（2026/10/2 版），原作來源來自 Wikidata，各國票房、上映日與預算來自 Box Office Mojo 的單片頁面（部分片尚未取得，所以這幾項的樣本較小）。每部片的 IMDb 編號都已和片名、年份逐一核對。</li>
+      <li><b>Netflix 資料：</b>Netflix 官方 Top 10 公開檔（Tudum），2021/7–2026/9，各國每週前十名與全球前十名；作品來源依 Wikidata 的出品國與原始語言判定，約 85% 的上榜紀錄可辨識。</li>
+      <li><b>限制：</b>美國票房只解釋台灣票房約四成的差異，剩下來自類型、明星、檔期等；只收台灣破千萬的片，預期值可能略為偏高；2026 下半年的片可能仍在上映。</li>
+    </ul>
+  </section>
+
+  <section id="data">
+    <div class="sec-head"><h2>下載資料</h2>
+      <p class="muted">以下是本頁分析用到的整理後資料（CSV，可用 Excel 開啟）。資料來源與使用條款見 <a href="https://github.com/jinfer68/taiwan-us-box-office#資料來源與使用條款">專案說明</a>。</p></div>
+    <ul class="method">
+      <li><a href="data/films_tw_vs_us_499.csv">films_tw_vs_us_499.csv</a>：499 部美國片的台美票房、預期值、類型、評分、預算、各國票房</li>
+      <li><a href="data/films_cast_directors.csv">films_cast_directors.csv</a>：主要演員與導演</li>
+      <li><a href="data/dune2_taiwan_daily.csv">dune2_taiwan_daily.csv</a>：《沙丘：第二部》台灣每日票房</li>
+      <li><a href="data/streaming_windows_taiwan.csv">streaming_windows_taiwan.csv</a>：11 部片的台灣串流上架日</li>
+      <li><a href="data/netflix_taiwan_titles.csv">netflix_taiwan_titles.csv</a>：台灣 Netflix 前十名片單與作品來源</li>
+      <li><a href="data/netflix_title_origin.csv">netflix_title_origin.csv</a>：Netflix 片名與來源國對照</li>
+      <li><a href="data/netflix_theatrical_films_link.csv">netflix_theatrical_films_link.csv</a>：好萊塢院線片在 Netflix 各榜的週數</li>
+      <li><a href="data/netflix_country_weekly_with_origin.csv.gz">netflix_country_weekly_with_origin.csv.gz</a>：Netflix 94 國每週前十名（壓縮檔，5.7MB）</li>
+    </ul>
+  </section>
+
+  <footer>資料：全國電影票房統計資訊系統、Box Office Mojo、IMDb、Wikidata、Netflix Top 10。台灣票房單位為新台幣，美國票房為美元。</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const DATA = {"analysis":{"genre":[{"zh":"奇幻","en":"Fantasy","n":53,"x":1.512,"above":28,"below":13},{"zh":"動作","en":"Action","n":227,"x":1.411,"above":25,"below":10},{"zh":"科幻","en":"Sci-Fi","n":62,"x":1.272,"above":23,"below":8},{"zh":"冒險","en":"Adventure","n":233,"x":1.254,"above":21,"below":14},{"zh":"驚悚","en":"Thriller","n":81,"x":1.083,"above":21,"below":10},{"zh":"犯罪","en":"Crime","n":60,"x":0.877,"above":12,"below":15},{"zh":"喜劇","en":"Comedy","n":149,"x":0.817,"above":8,"below":26},{"zh":"劇情","en":"Drama","n":138,"x":0.815,"above":7,"below":17},{"zh":"懸疑","en":"Mystery","n":47,"x":0.802,"above":4,"below":15},{"zh":"恐怖","en":"Horror","n":78,"x":0.799,"above":3,"below":19},{"zh":"愛情","en":"Romance","n":22,"x":0.793,"above":5,"below":32},{"zh":"動畫","en":"Animation","n":66,"x":0.731,"above":5,"below":27},{"zh":"家庭","en":"Family","n":28,"x":0.581,"above":7,"below":32},{"zh":"傳記","en":"Biography","n":23,"x":0.547,"above":4,"below":26}],"markets":[{"zh":"香港","n":432,"r":0.749},{"zh":"新加坡","n":323,"r":0.684},{"zh":"南韓","n":408,"r":0.602},{"zh":"日本","n":366,"r":0.396},{"zh":"澳洲","n":447,"r":0.117},{"zh":"英國","n":453,"r":0.068}],"foreign_share":{"上方":0.728,"下方":0.493,"帶內":0.577},"gap":[{"zh":"早 3 天以上","n":55,"x":1.728},{"zh":"前後一週內","n":284,"x":1.186},{"zh":"晚 1–4 週","n":63,"x":0.711},{"zh":"晚 1 個月以上","n":54,"x":0.594}],"budget":{"n":277,"flop_x":1.743,"ok_x":0.91,"n_flop":100,"coef":0.365},"year":[{"y":"2016","x":1.311,"n":48},{"y":"2017","x":1.359,"n":66},{"y":"2018","x":0.828,"n":76},{"y":"2019","x":1.126,"n":70},{"y":"2020","x":0.91,"n":15},{"y":"2022","x":0.978,"n":31},{"y":"2023","x":1.025,"n":47},{"y":"2024","x":0.745,"n":38},{"y":"2025","x":0.703,"n":37},{"y":"2026","x":1.032,"n":32}],"actors_hi":[{"name":"Tom Cruise","n":7,"x":3.76,"films":"神隱任務：永不回頭、捍衛戰士: 獨行俠、神鬼傳奇、美國製造"},{"name":"Jason Statham","n":11,"x":2.88,"films":"玩命特攻：武演行動、蜂刑者、巨齒鯊2: 海溝深淵、重裝制裁"},{"name":"Ving Rhames","n":4,"x":2.41,"films":"不可能的任務：全面瓦解、不可能的任務：最終清算、不可能的任務：致命清算 第一章、加菲貓：農場大冒險"},{"name":"Robert Downey Jr.","n":4,"x":2.27,"films":"杜立德、復仇者聯盟:終局之戰、復仇者聯盟：無限之戰、奧本海默"},{"name":"Gerard Butler","n":6,"x":2.17,"films":"潛艦獵殺令、氣象戰、極盜戰、迫降危機"},{"name":"Willem Dafoe","n":5,"x":1.98,"films":"東方快車謀殺案、長城、可憐的東西、水行俠"},{"name":"Mark Ruffalo","n":6,"x":1.91,"films":"可憐的東西、出神入化2、犯罪101、蜘蛛人：重生日"},{"name":"Vera Farmiga","n":4,"x":1.9,"films":"安娜貝爾回家囉、厲陰宅2、厲陰宅：最終聖事、哥吉拉II怪獸之王"}],"actors_lo":[{"name":"James Corden","n":4,"x":0.37,"films":"比得兔、CATS 貓、小腳怪、表情符號電影"},{"name":"Michael B. Jordan","n":4,"x":0.41,"films":"金牌拳手：父仇、罪人、不完美的正義、黑豹"},{"name":"Sam Rockwell","n":4,"x":0.46,"films":"壞蛋聯盟 2、壞蛋聯盟、意外、機密特務:阿蓋爾"},{"name":"Florence Pugh","n":4,"x":0.48,"films":"雷霆特攻隊、她們、我和我的摔角家庭、鞋貓劍客 2"},{"name":"Kate McKinnon","n":4,"x":0.49,"films":"女狼嗨到趴、萌牛費迪南、DC超級寵物軍團、Barbie芭比"},{"name":"Hong Chau","n":4,"x":0.55,"films":"咆哮山莊、縮小人生、五星饗魘、我的鯨魚老爸"},{"name":"Matthew McConaughey","n":4,"x":0.55,"films":"歡樂好聲音、紳士追殺令、歡樂好聲音 2、黑塔"},{"name":"Isabela Merced","n":4,"x":0.55,"films":"朵拉與失落的黃金城、蜘蛛夫人、速成家庭、異形：羅穆路斯"}],"directors_hi":[{"name":"Christopher McQuarrie","n":3,"x":4.76,"films":"不可能的任務：最終清算、不可能的任務：致命清算 第一章、不可能的任務：全面瓦解"},{"name":"James Wan","n":3,"x":2.96,"films":"水行俠 失落王國、厲陰宅2、水行俠"},{"name":"Roland Emmerich","n":3,"x":2.55,"films":"月球隕落、決戰中途島、ID4 星際重生"},{"name":"David Yates","n":4,"x":2.25,"films":"怪獸與牠們的產地、怪獸與葛林戴華德的罪行、怪獸與鄧不利多的秘密"},{"name":"Chad Stahelski","n":3,"x":1.86,"films":"捍衛任務4、捍衛任務2：殺神回歸、捍衛任務3：全面開戰"},{"name":"Guy Ritchie","n":4,"x":1.84,"films":"玩命特攻：武演行動、紳士追殺令、亞瑟：王者之劍"}],"directors_lo":[{"name":"Jeff Fowler","n":3,"x":0.25,"films":"音速小子、音速小子 2、音速小子 3"},{"name":"Jordan Peele","n":3,"x":0.45,"films":"不!、逃出絕命鎮、我們"},{"name":"Clint Eastwood","n":3,"x":0.59,"films":"賭命運轉手、薩利機長：哈德遜奇蹟、15:17巴黎列車"},{"name":"Tim Burton","n":3,"x":0.67,"films":"怪奇孤兒院、陰間大法師 BEETLEJUICE、小飛象"},{"name":"Antoine Fuqua","n":4,"x":0.71,"films":"麥可傑克森、絕地7騎士、私刑教育2"},{"name":"Jon M. Chu","n":4,"x":0.81,"films":"瘋狂亞洲富豪、魔法壞女巫、出神入化2"}],"ladder":[{"step":"只用美國票房","r2":0.384},{"step":"＋類型","r2":0.492},{"step":"＋明星","r2":0.52},{"step":"＋IMDb 評分","r2":0.523},{"step":"＋海外票房占比","r2":0.724}],"n_model":459,"rating":{"coef_x":1.112,"t":2.9,"by_group":{"上方":6.6,"下方":6.6,"帶內":6.6}},"star":{"n":349,"t":4.9,"corr":0.314},"groups":{"帶內":312,"下方":79,"上方":69},"coverage":{"mojo_markets":432,"mojo_any":456,"budget":277,"n":460}},"netflix":{"weeks":274,"from":"2021-07-04","to":"2026-09-27","n_countries":94,"tw_titles":1685,"overlap":[{"c":"日本","v":27.8,"films":26.3,"tv":29.2,"rank":1},{"c":"南韓","v":36.5,"films":34.5,"tv":38.5,"rank":2},{"c":"台灣","v":44.0,"films":45.9,"tv":42.0,"rank":3},{"c":"泰國","v":47.6,"films":42.6,"tv":52.6,"rank":4},{"c":"越南","v":47.8,"films":40.2,"tv":55.5,"rank":5},{"c":"印尼","v":48.4,"films":39.0,"tv":57.9,"rank":6},{"c":"菲律賓","v":52.0,"films":43.6,"tv":60.4,"rank":7},{"c":"香港","v":52.9,"films":48.8,"tv":57.0,"rank":8},{"c":"馬來西亞","v":53.8,"films":48.4,"tv":59.1,"rank":9},{"c":"印度","v":54.1,"films":43.5,"tv":64.7,"rank":10},{"c":"愛爾蘭","v":56.0,"films":44.5,"tv":67.6,"rank":11},{"c":"巴基斯坦","v":58.4,"films":50.9,"tv":65.9,"rank":12},{"c":"孟加拉","v":58.4,"films":49.2,"tv":67.6,"rank":13},{"c":"英國","v":58.9,"films":45.4,"tv":72.4,"rank":14},{"c":"新加坡","v":60.3,"films":54.3,"tv":66.3,"rank":15},{"c":"Turkey","v":60.9,"films":51.9,"tv":69.9,"rank":16},{"c":"Nigeria","v":61.1,"films":51.8,"tv":70.4,"rank":17},{"c":"Egypt","v":61.4,"films":47.4,"tv":75.5,"rank":18},{"c":"New Zealand","v":62.0,"films":45.5,"tv":78.5,"rank":19},{"c":"Jordan","v":62.2,"films":51.5,"tv":72.8,"rank":20},{"c":"South Africa","v":62.8,"films":53.4,"tv":72.3,"rank":21},{"c":"Ukraine","v":63.0,"films":53.7,"tv":72.2,"rank":22},{"c":"澳洲","v":63.3,"films":48.4,"tv":78.2,"rank":23},{"c":"加拿大","v":64.1,"films":48.2,"tv":80.0,"rank":24},{"c":"Latvia","v":65.4,"films":54.6,"tv":76.3,"rank":25},{"c":"Kenya","v":65.6,"films":55.1,"tv":76.0,"rank":26},{"c":"New Caledonia","v":65.6,"films":52.6,"tv":78.6,"rank":27},{"c":"Jamaica","v":65.8,"films":61.1,"tv":70.4,"rank":28},{"c":"Lebanon","v":66.4,"films":54.9,"tv":77.8,"rank":29},{"c":"Poland","v":66.4,"films":62.1,"tv":70.7,"rank":30},{"c":"Italy","v":66.4,"films":55.9,"tv":77.0,"rank":31},{"c":"Estonia","v":66.4,"films":57.4,"tv":75.4,"rank":32},{"c":"Lithuania","v":66.6,"films":58.3,"tv":74.9,"rank":33},{"c":"Saudi Arabia","v":66.8,"films":56.0,"tv":77.6,"rank":34},{"c":"Denmark","v":66.9,"films":54.7,"tv":79.1,"rank":35},{"c":"Netherlands","v":67.0,"films":55.4,"tv":78.7,"rank":36},{"c":"Iceland","v":67.1,"films":57.2,"tv":76.9,"rank":37},{"c":"Norway","v":67.4,"films":56.9,"tv":77.8,"rank":38},{"c":"Réunion","v":67.5,"films":54.0,"tv":81.0,"rank":39},{"c":"Sweden","v":67.8,"films":56.9,"tv":78.6,"rank":40},{"c":"Martinique","v":68.0,"films":57.4,"tv":78.5,"rank":41},{"c":"Bahamas","v":68.1,"films":61.2,"tv":74.9,"rank":42},{"c":"Finland","v":68.2,"films":55.8,"tv":80.7,"rank":43},{"c":"Guadeloupe","v":68.2,"films":58.2,"tv":78.2,"rank":44},{"c":"Israel","v":68.5,"films":59.7,"tv":77.3,"rank":45},{"c":"Germany","v":68.9,"films":57.3,"tv":80.6,"rank":46},{"c":"France","v":69.2,"films":54.6,"tv":83.9,"rank":47},{"c":"Oman","v":69.6,"films":63.7,"tv":75.5,"rank":48},{"c":"Kuwait","v":69.8,"films":58.7,"tv":80.9,"rank":49},{"c":"Spain","v":70.0,"films":62.1,"tv":78.0,"rank":50},{"c":"馬爾地夫","v":70.1,"films":63.3,"tv":76.9,"rank":51},{"c":"Austria","v":70.2,"films":58.9,"tv":81.6,"rank":52},{"c":"Greece","v":70.4,"films":58.6,"tv":82.3,"rank":53},{"c":"Slovenia","v":70.8,"films":59.0,"tv":82.7,"rank":54},{"c":"Romania","v":70.8,"films":57.9,"tv":83.6,"rank":55},{"c":"Bolivia","v":70.8,"films":66.1,"tv":75.6,"rank":56},{"c":"Cyprus","v":70.9,"films":60.2,"tv":81.6,"rank":57},{"c":"Czech Republic","v":71.0,"films":56.9,"tv":85.2,"rank":58},{"c":"Trinidad and Tobago","v":71.2,"films":64.3,"tv":78.2,"rank":59},{"c":"Ecuador","v":71.4,"films":70.5,"tv":72.4,"rank":60},{"c":"El Salvador","v":71.4,"films":68.3,"tv":74.5,"rank":61},{"c":"美國","v":71.4,"films":61.8,"tv":80.9,"rank":62},{"c":"Bulgaria","v":71.8,"films":59.0,"tv":84.6,"rank":63},{"c":"斯里蘭卡","v":71.9,"films":60.8,"tv":83.0,"rank":64},{"c":"Russia","v":72.0,"films":67.1,"tv":76.9,"rank":65},{"c":"Nicaragua","v":72.6,"films":70.7,"tv":74.5,"rank":66},{"c":"Croatia","v":72.8,"films":63.5,"tv":82.1,"rank":67},{"c":"Peru","v":73.1,"films":70.8,"tv":75.4,"rank":68},{"c":"Honduras","v":73.2,"films":71.7,"tv":74.8,"rank":69},{"c":"Guatemala","v":73.3,"films":70.4,"tv":76.2,"rank":70},{"c":"Bahrain","v":73.4,"films":63.6,"tv":83.3,"rank":71},{"c":"Dominican Republic","v":73.8,"films":70.7,"tv":76.9,"rank":72},{"c":"Malta","v":73.8,"films":63.1,"tv":84.5,"rank":73},{"c":"卡達","v":73.9,"films":62.4,"tv":85.4,"rank":74},{"c":"United Arab Emirates","v":74.2,"films":63.7,"tv":84.6,"rank":75},{"c":"Brazil","v":74.2,"films":73.1,"tv":75.3,"rank":76},{"c":"Belgium","v":75.0,"films":63.5,"tv":86.4,"rank":77},{"c":"Morocco","v":75.4,"films":66.8,"tv":83.9,"rank":78},{"c":"Mauritius","v":75.5,"films":68.0,"tv":83.0,"rank":79},{"c":"Slovakia","v":75.8,"films":63.4,"tv":88.2,"rank":80},{"c":"Mexico","v":76.0,"films":70.2,"tv":81.8,"rank":81},{"c":"Serbia","v":76.2,"films":65.9,"tv":86.6,"rank":82},{"c":"Colombia","v":76.6,"films":75.6,"tv":77.5,"rank":83},{"c":"Argentina","v":76.8,"films":74.2,"tv":79.4,"rank":84},{"c":"Costa Rica","v":76.9,"films":74.7,"tv":79.1,"rank":85},{"c":"Switzerland","v":77.3,"films":67.6,"tv":87.0,"rank":86},{"c":"Venezuela","v":77.8,"films":77.0,"tv":78.6,"rank":87},{"c":"Uruguay","v":77.9,"films":75.1,"tv":80.8,"rank":88},{"c":"Hungary","v":78.2,"films":67.6,"tv":88.9,"rank":89},{"c":"智利","v":78.2,"films":73.9,"tv":82.5,"rank":90},{"c":"巴拉圭","v":78.8,"films":75.8,"tv":81.9,"rank":91},{"c":"盧森堡","v":79.8,"films":71.7,"tv":87.8,"rank":92},{"c":"巴拿馬","v":80.8,"films":77.8,"tv":83.9,"rank":93},{"c":"葡萄牙","v":81.2,"films":72.4,"tv":90.1,"rank":94}],"similar":[{"c":"香港","v":0.537},{"c":"越南","v":0.386},{"c":"新加坡","v":0.385},{"c":"印尼","v":0.344},{"c":"菲律賓","v":0.341},{"c":"馬來西亞","v":0.336},{"c":"泰國","v":0.313},{"c":"南韓","v":0.248},{"c":"加拿大","v":0.106},{"c":"英國","v":0.101},{"c":"美國","v":0.094},{"c":"愛爾蘭","v":0.094}],"comp_films":[{"c":"台灣","parts":{"台灣":8.4,"韓國":5.9,"日本":5.8,"中國／香港":6.5,"美國":47.5,"其他英語系":3.7,"其他":22.2}},{"c":"香港","parts":{"台灣":2.6,"韓國":5.2,"日本":4.1,"中國／香港":6.5,"美國":57.9,"其他英語系":4.0,"其他":19.7}},{"c":"南韓","parts":{"台灣":0.4,"韓國":34.5,"日本":2.6,"中國／香港":1.9,"美國":36.2,"其他英語系":3.5,"其他":20.9}},{"c":"日本","parts":{"台灣":0.3,"韓國":4.6,"日本":22.1,"中國／香港":0.8,"美國":35.8,"其他英語系":2.1,"其他":34.3}},{"c":"美國","parts":{"台灣":0.1,"韓國":0.4,"日本":0.6,"中國／香港":1.1,"美國":79.4,"其他英語系":3.8,"其他":14.6}},{"c":"94 國平均","parts":{"台灣":0.3,"韓國":2.0,"日本":1.4,"中國／香港":1.6,"美國":59.3,"其他英語系":4.6,"其他":30.8}}],"comp_tv":[{"c":"台灣","parts":{"台灣":7.9,"韓國":36.2,"日本":18.5,"中國／香港":13.2,"美國":5.2,"其他英語系":1.1,"其他":17.9}},{"c":"香港","parts":{"台灣":3.2,"韓國":35.9,"日本":22.2,"中國／香港":4.0,"美國":13.9,"其他英語系":3.4,"其他":17.4}},{"c":"南韓","parts":{"台灣":0.0,"韓國":56.6,"日本":6.7,"中國／香港":1.2,"美國":3.5,"其他英語系":0.7,"其他":31.3}},{"c":"日本","parts":{"台灣":0.1,"韓國":28.6,"日本":46.4,"中國／香港":0.2,"美國":3.0,"其他英語系":0.1,"其他":21.6}},{"c":"美國","parts":{"台灣":0.1,"韓國":2.8,"日本":1.6,"中國／香港":0.0,"美國":53.8,"其他英語系":7.2,"其他":34.5}},{"c":"94 國平均","parts":{"台灣":0.2,"韓國":12.2,"日本":3.1,"中國／香港":0.4,"美國":37.9,"其他英語系":7.9,"其他":38.3}}],"trend_tv":{"韓國":{"2021":53.1,"2022":43.3,"2023":36.6,"2024":29.8,"2025":29.0,"2026":32.8},"日本":{"2021":5.8,"2022":10.8,"2023":19.6,"2024":24.4,"2025":21.5,"2026":24.1},"中國／香港":{"2021":9.2,"2022":17.5,"2023":12.3,"2024":11.7,"2025":15.4,"2026":10.5},"台灣":{"2021":7.3,"2022":7.9,"2023":10.2,"2024":11.3,"2025":4.6,"2026":5.1},"美國":{"2021":8.1,"2022":7.9,"2023":3.2,"2024":4.8,"2025":5.2,"2026":3.1}},"local_share_titles":40.7,"local_hits":[{"t":"Solo Leveling","cat":"影集","o":"日本","w":27,"b":4},{"t":"Man in Love","cat":"電影","o":"台灣","w":22,"b":1},{"t":"Love Like the Galaxy","cat":"影集","o":"中國／香港","w":20,"b":1},{"t":"Light the Night","cat":"影集","o":"台灣","w":16,"b":1},{"t":"Gold Leaf","cat":"影集","o":"日本","w":13,"b":2},{"t":"That Time I Got Reincarnated as a Slime","cat":"影集","o":"日本","w":13,"b":5},{"t":"GATAO: Like Father Like Son","cat":"電影","o":"台灣","w":13,"b":1},{"t":"Love Between Fairy and Devil","cat":"影集","o":"中國／香港","w":12,"b":1},{"t":"Who Rules the World","cat":"影集","o":"中國／香港","w":11,"b":1},{"t":"Until the T-shirt Dries","cat":"影集","o":"日本","w":11,"b":4},{"t":"Daemons of the Shadow Realm","cat":"影集","o":"日本","w":11,"b":4},{"t":"Demon Slayer -Kimetsu no Yaiba- The Movie: Mugen Train","cat":"電影","o":"日本","w":10,"b":1}],"longer_tw":[{"t":"The Apothecary Diaries","o":"日本","tw":36,"g":1},{"t":"SPY x FAMILY","o":"日本","tw":37,"g":4},{"t":"Jujutsu Kaisen","o":"日本","tw":39,"g":11},{"t":"Kaiju No. 8","o":"日本","tw":25,"g":2},{"t":"Demon Slayer: Kimetsu no Yaiba","o":"日本","tw":33,"g":15},{"t":"Frieren: Beyond Journey's End","o":"日本","tw":17,"g":3},{"t":"Magic and Muscles","o":"日本","tw":15,"g":1},{"t":"【OSHI NO KO】","o":"日本","tw":15,"g":1}],"missed":[{"t":"Raw","cat":"TV (English)","g":82},{"t":"Love Is Blind","cat":"TV (English)","g":44},{"t":"Yo soy Betty, la fea","cat":"TV (Non-English)","g":30},{"t":"Café con aroma de mujer","cat":"TV (Non-English)","g":28},{"t":"Virgin River","cat":"TV (English)","g":28},{"t":"Ms. Rachel","cat":"TV (English)","g":27},{"t":"The Boss Baby","cat":"Films (English)","g":27},{"t":"The Lincoln Lawyer","cat":"TV (English)","g":24}],"tw_content":{"n":96,"abroad":49,"markets":[{"c":"香港","n":44},{"c":"新加坡","n":31},{"c":"越南","n":22},{"c":"馬來西亞","n":19},{"c":"泰國","n":13},{"c":"菲律賓","n":12}],"top":[{"t":"Man in Love","w":22,"g":false},{"t":"Light the Night","w":16,"g":false},{"t":"Marry My Dead Body","w":15,"g":true},{"t":"GATAO: Like Father Like Son","w":13,"g":false},{"t":"The Abandoned","w":10,"g":true},{"t":"Best Interest","w":10,"g":false}]},"theatrical":{"n":73,"r":0.3,"p":0.01,"pts":[{"t":"28年毀滅倒數","x":0.45,"d":1,"tw":2,"g":1},{"t":"劫命救護","x":0.98,"d":1,"tw":2,"g":1},{"t":"大蟒蛇","x":0.23,"d":-1,"tw":3,"g":4},{"t":"水行俠 失落王國","x":2.91,"d":-3,"tw":0,"g":3},{"t":"絕地戰警：生死與共","x":0.87,"d":2,"tw":4,"g":2},{"t":"壞蛋聯盟","x":0.3,"d":-3,"tw":2,"g":5},{"t":"壞蛋聯盟 2","x":0.34,"d":-1,"tw":0,"g":1},{"t":"陰間大法師 BEETLEJUICE","x":0.1,"d":-2,"tw":0,"g":2},{"t":"黑亞當","x":1.76,"d":1,"tw":3,"g":2},{"t":"子彈列車","x":1.95,"d":4,"tw":9,"g":5},{"t":"A.I.創世者","x":1.08,"d":0,"tw":1,"g":1},{"t":"尼羅河謀殺案","x":1.03,"d":0,"tw":1,"g":1},{"t":"神偷奶爸 4","x":1.25,"d":-4,"tw":7,"g":11},{"t":"沙丘","x":2.51,"d":5,"tw":6,"g":1},{"t":"龍與地下城：盜賊榮耀","x":1.69,"d":0,"tw":3,"g":3},{"t":"私刑教育3","x":1.17,"d":4,"tw":8,"g":4},{"t":"玩命關頭9","x":1.58,"d":7,"tw":12,"g":5},{"t":"玩命關頭 X","x":4.64,"d":3,"tw":4,"g":1},{"t":"閃電俠","x":2.18,"d":0,"tw":1,"g":1},{"t":"芙莉歐莎：瘋狂麥斯傳奇篇章","x":1.21,"d":-1,"tw":0,"g":1},{"t":"加菲貓：農場大冒險","x":0.31,"d":-2,"tw":1,"g":3},{"t":"魔鬼剋星：冰天凍地","x":0.16,"d":0,"tw":2,"g":2},{"t":"神鬼戰士 2","x":0.7,"d":-1,"tw":2,"g":3},{"t":"山羊巔峰","x":0.5,"d":-2,"tw":4,"g":6},{"t":"哥吉拉與金剛 : 新帝國","x":2.63,"d":-3,"tw":0,"g":3},{"t":"馴龍高手","x":1.15,"d":-1,"tw":0,"g":1},{"t":"幻幻之交","x":0.18,"d":-1,"tw":0,"g":1},{"t":"侏羅紀世界: 統霸天下","x":2.28,"d":3,"tw":5,"g":2},{"t":"侏羅紀世界：重生","x":2.19,"d":-3,"tw":0,"g":3},{"t":"獵人克萊文","x":0.63,"d":0,"tw":4,"g":4},{"t":"功夫熊貓 4","x":0.52,"d":1,"tw":3,"g":2},{"t":"細物警探","x":0.67,"d":-3,"tw":2,"g":5},{"t":"失落謎城","x":0.38,"d":-1,"tw":1,"g":2},{"t":"窒友梅根","x":0.77,"d":1,"tw":2,"g":1},{"t":"窒友梅根 2.0","x":0.56,"d":-1,"tw":0,"g":1},{"t":"蜘蛛夫人","x":0.63,"d":1,"tw":5,"g":4},{"t":"超難搞先生","x":0.26,"d":1,"tw":7,"g":6},{"t":"捍衛救援","x":0.76,"d":-4,"tw":0,"g":4},{"t":"巨齒鯊2: 海溝深淵","x":2.34,"d":3,"tw":4,"g":1},{"t":"五星饗魘","x":0.5,"d":-2,"tw":0,"g":2},{"t":"飛鴨向前衝","x":0.28,"d":-4,"tw":0,"g":4},{"t":"MINECRAFT 麥塊電影","x":0.86,"d":0,"tw":2,"g":2},{"t":"小小兵2:格魯的崛起","x":1.02,"d":-3,"tw":9,"g":12},{"t":"魔比斯","x":1.01,"d":2,"tw":5,"g":3},{"t":"無名弒","x":1.01,"d":3,"tw":4,"g":1},{"t":"007 生死交戰","x":1.85,"d":0,"tw":3,"g":3},{"t":"汪汪隊立大功：超級大電影","x":1.09,"d":-2,"tw":3,"g":5},{"t":"汪汪隊立大功電影版","x":0.55,"d":-15,"tw":2,"g":17},{"t":"迫降危機","x":1.06,"d":-4,"tw":0,"g":4},{"t":"梵蒂岡驅魔士","x":0.6,"d":-1,"tw":2,"g":3},{"t":"鞋貓劍客 2","x":0.26,"d":-7,"tw":0,"g":7},{"t":"噤界：入侵日","x":0.73,"d":0,"tw":2,"g":2},{"t":"噤界II","x":0.3,"d":0,"tw":2,"g":2},{"t":"爆復","x":1.08,"d":-1,"tw":0,"g":1},{"t":"歡樂好聲音 2","x":0.29,"d":-9,"tw":4,"g":13},{"t":"微笑","x":0.41,"d":0,"tw":1,"g":1},{"t":"微笑 2","x":0.25,"d":-1,"tw":0,"g":1},{"t":"音速小子 2","x":0.17,"d":-1,"tw":0,"g":1},{"t":"音速小子 3","x":0.29,"d":-3,"tw":0,"g":3},{"t":"蜘蛛人：穿越新宇宙","x":0.73,"d":0,"tw":2,"g":2},{"t":"蜘蛛人：無家日","x":2.02,"d":3,"tw":5,"g":2},{"t":"超級瑪利歐兄弟電影版","x":1.51,"d":-13,"tw":11,"g":24},{"t":"幸福入場券","x":0.38,"d":0,"tw":1,"g":1},{"t":"捍衛戰士: 獨行俠","x":3.24,"d":6,"tw":9,"g":3},{"t":"變形金剛：萬獸崛起","x":1.87,"d":0,"tw":3,"g":3},{"t":"圈套","x":0.38,"d":0,"tw":3,"g":3},{"t":"龍捲風暴","x":0.75,"d":1,"tw":2,"g":1},{"t":"秘境探險","x":0.98,"d":3,"tw":8,"g":5},{"t":"猛毒最終章：最後一舞","x":1.67,"d":2,"tw":4,"g":2},{"t":"猛毒2：血蜘蛛","x":1.55,"d":2,"tw":6,"g":4},{"t":"荒野機器人","x":0.71,"d":-1,"tw":2,"g":3},{"t":"旺卡","x":1.02,"d":-1,"tw":0,"g":1},{"t":"玩命鈔劫","x":3.39,"d":-2,"tw":0,"g":2}]},"lag":[{"d":"索尼","n":21,"lag":136},{"d":"華納","n":16,"lag":664},{"d":"派拉蒙","n":11,"lag":671},{"d":"環球","n":20,"lag":686},{"d":"A24","n":2,"lag":695},{"d":"迪士尼（20 世紀）","n":2,"lag":1311}]},"films":[{"zh":"12猛漢","en":"12 Strong","rel":"2018-01-19","tw":36100389,"us":45819713,"exp":34521788,"r":1.046,"z":0.05,"covid":false,"g":"Action,Drama,History","ir":6.6},{"zh":"15:17巴黎列車","en":"The 15:17 to Paris","rel":"2018-02-08","tw":16074226,"us":36276286,"exp":29407961,"r":0.547,"z":-0.7,"covid":false,"g":"Biography,Drama,Thriller","ir":5.3},{"zh":"1917","en":"1917","rel":"2020-01-30","tw":74499228,"us":159227644,"exp":81180263,"r":0.918,"z":-0.1,"covid":false,"g":"Drama,War","ir":8.2},{"zh":"28年毀滅倒數","en":"28 Years Later","rel":"2025-06-17","tw":20830146,"us":70446897,"exp":46380183,"r":0.449,"z":-0.92,"covid":false,"g":"Horror,Sci-Fi,Thriller","ir":6.6},{"zh":"壞壞萌雪怪","en":"Abominable","rel":"2019-10-04","tw":16684674,"us":60716390,"exp":41880970,"r":0.398,"z":-1.06,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.0},{"zh":"會計師","en":"The Accountant","rel":"2016-10-14","tw":115923865,"us":86260045,"exp":53297400,"r":2.175,"z":0.9,"covid":false,"g":"Action,Crime,Drama","ir":7.3},{"zh":"會計師 2","en":"The Accountant 2","rel":"2025-04-21","tw":51201446,"us":65523366,"exp":44129826,"r":1.16,"z":0.17,"covid":false,"g":"Action,Crime,Drama","ir":6.6},{"zh":"星際救援","en":"Ad Astra","rel":"2019-09-20","tw":34110908,"us":50188370,"exp":36748844,"r":0.928,"z":-0.09,"covid":false,"g":"Adventure,Drama,Mystery","ir":6.5},{"zh":"阿達一族","en":"The Addams Family","rel":"2019-11-01","tw":20029715,"us":100044905,"exp":59007147,"r":0.339,"z":-1.25,"covid":false,"g":"Animation,Comedy,Family","ir":5.9},{"zh":"AIR","en":"Air","rel":"2023-04-05","tw":10924378,"us":52460106,"exp":37882777,"r":0.288,"z":-1.43,"covid":false,"g":"Drama,Sport","ir":7.4},{"zh":"阿拉丁","en":"Aladdin","rel":"2019-05-22","tw":290433029,"us":355559216,"exp":140914428,"r":2.061,"z":0.83,"covid":false,"g":"Adventure,Comedy,Family","ir":6.9},{"zh":"魔境夢遊：時光怪客","en":"Alice Through the Looking Glass","rel":"2016-07-25","tw":58016176,"us":77041381,"exp":49318539,"r":1.176,"z":0.19,"covid":false,"g":"Adventure,Family,Fantasy","ir":6.2},{"zh":"異形：聖約","en":"Alien: Covenant","rel":"2017-05-10","tw":81823528,"us":74262031,"exp":48090139,"r":1.701,"z":0.61,"covid":false,"g":"Horror,Sci-Fi,Thriller","ir":6.4},{"zh":"異形：羅穆路斯","en":"Alien: Romulus","rel":"2024-08-14","tw":105960162,"us":105313091,"exp":61122941,"r":1.734,"z":0.63,"covid":false,"g":"Horror,Sci-Fi,Thriller","ir":7.1},{"zh":"艾莉塔：戰鬥天使","en":"Alita: Battle Angel","rel":"2019-02-05","tw":276857126,"us":85838210,"exp":53118342,"r":5.212,"z":1.9,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.3},{"zh":"同盟鶼鰈","en":"Allied","rel":"2017-01-06","tw":33112717,"us":40098064,"exp":31501176,"r":1.051,"z":0.06,"covid":false,"g":"Action,Drama,Romance","ir":7.1},{"zh":"復仇反擊戰","en":"The Amateur","rel":"2025-04-11","tw":14350203,"us":40759635,"exp":31857041,"r":0.45,"z":-0.92,"covid":false,"g":"Action,Thriller","ir":6.5},{"zh":"劫命救護","en":"Ambulance","rel":"2022-03-25","tw":20903211,"us":22781115,"exp":21368059,"r":0.978,"z":-0.03,"covid":false,"g":"Action,Adventure,Crime","ir":6.1},{"zh":"美國製造","en":"American Made","rel":"2017-08-25","tw":70840298,"us":51342000,"exp":37326643,"r":1.898,"z":0.74,"covid":false,"g":"Action,Comedy,Crime","ir":7.2},{"zh":"大蟒蛇","en":"Anaconda","rel":"2025-12-21","tw":10256641,"us":65098148,"exp":43933032,"r":0.233,"z":-1.68,"covid":false,"g":"Action,Adventure,Comedy","ir":5.5},{"zh":"全面攻佔3: 天使救援","en":"Angel Has Fallen","rel":"2019-08-21","tw":147411122,"us":69030436,"exp":45737975,"r":3.223,"z":1.35,"covid":false,"g":"Action,Thriller","ir":6.4},{"zh":"憤怒鳥玩電影","en":"The Angry Birds Movie","rel":"2016-06-08","tw":37673704,"us":107509366,"exp":61995151,"r":0.608,"z":-0.57,"covid":false,"g":"Action,Adventure,Animation","ir":6.3},{"zh":"憤怒鳥玩電影2：冰的啦！","en":"The Angry Birds Movie 2","rel":"2019-08-14","tw":19621151,"us":41667116,"exp":32342252,"r":0.607,"z":-0.58,"covid":false,"g":"Action,Adventure,Animation","ir":6.4},{"zh":"安娜","en":"Anna","rel":"2019-06-19","tw":34310260,"us":7743794,"exp":10187568,"r":3.368,"z":1.4,"covid":false,"g":"Action,Adventure,Thriller","ir":6.7},{"zh":"安娜貝爾回家囉","en":"Annabelle Comes Home","rel":"2019-06-25","tw":84077501,"us":74152591,"exp":48041477,"r":1.75,"z":0.65,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.9},{"zh":"安娜貝爾：造孽","en":"Annabelle: Creation","rel":"2017-08-10","tw":111997735,"us":102092201,"exp":59833430,"r":1.872,"z":0.72,"covid":false,"g":"Horror,Mystery,Thriller","ir":6.5},{"zh":"蟻人與黃蜂女","en":"Ant-Man and the Wasp","rel":"2018-07-04","tw":297169899,"us":216648740,"exp":100289949,"r":2.963,"z":1.25,"covid":false,"g":"Action,Adventure,Comedy","ir":7.0},{"zh":"蟻人與黃蜂女 : 量子狂熱","en":"Ant-Man and the Wasp: Quantumania","rel":"2023-02-15","tw":141253592,"us":214504909,"exp":99607627,"r":1.418,"z":0.4,"covid":false,"g":"Action,Adventure,Comedy","ir":6.0},{"zh":"水行俠","en":"Aquaman","rel":"2018-12-12","tw":470984595,"us":335061807,"exp":135286182,"r":3.481,"z":1.44,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.8},{"zh":"水行俠 失落王國","en":"Aquaman and the Lost Kingdom","rel":"2023-12-20","tw":199762315,"us":124481226,"exp":68557780,"r":2.914,"z":1.23,"covid":false,"g":"Action,Adventure,Fantasy","ir":5.6},{"zh":"機密特務:阿蓋爾","en":"Argylle","rel":"2024-01-31","tw":44762553,"us":45207275,"exp":34204365,"r":1.309,"z":0.31,"covid":false,"g":"Action,Adventure,Comedy","ir":5.6},{"zh":"異星入境","en":"Arrival","rel":"2017-02-10","tw":27523342,"us":100546139,"exp":59209930,"r":0.465,"z":-0.88,"covid":false,"g":"Drama,Mystery,Sci-Fi","ir":7.9},{"zh":"刺客教條","en":"Assassin's Creed","rel":"2016-12-28","tw":92950881,"us":54647948,"exp":38960365,"r":2.386,"z":1.0,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.6},{"zh":"極凍之城","en":"Atomic Blonde","rel":"2017-07-28","tw":16116613,"us":51687870,"exp":37499077,"r":0.43,"z":-0.97,"covid":false,"g":"Action,Adventure,Thriller","ir":6.7},{"zh":"阿凡達：火與燼","en":"Avatar: Fire and Ash","rel":"2025-12-17","tw":492559232,"us":404340010,"exp":153916216,"r":3.2,"z":1.34,"covid":false,"g":"Action,Adventure,Drama","ir":7.2},{"zh":"阿凡達：水之道","en":"Avatar: The Way of Water","rel":"2022-12-14","tw":750313578,"us":684075767,"exp":220823360,"r":3.398,"z":1.41,"covid":false,"g":"Action,Adventure,Fantasy","ir":7.5},{"zh":"復仇者聯盟:終局之戰","en":"Avengers: Endgame","rel":"2019-04-24","tw":910456089,"us":858373000,"exp":258054631,"r":3.528,"z":1.45,"covid":false,"g":"Action,Adventure","ir":8.4},{"zh":"復仇者聯盟：無限之戰","en":"Avengers: Infinity War","rel":"2018-04-25","tw":641776135,"us":678815482,"exp":219656290,"r":2.922,"z":1.24,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":8.4},{"zh":"玩命再劫","en":"Baby Driver","rel":"2017-08-03","tw":42102315,"us":107825862,"exp":62120379,"r":0.678,"z":-0.45,"covid":false,"g":"Action,Crime,Drama","ir":7.5},{"zh":"後室","en":"Backrooms","rel":"2026-05-25","tw":84322869,"us":197523513,"exp":94124851,"r":0.896,"z":-0.13,"covid":false,"g":"Horror,Sci-Fi,Thriller","ir":6.7},{"zh":"絕地戰警FOR LIFE","en":"Bad Boys for Life","rel":"2020-01-16","tw":136881045,"us":206305244,"exp":96977890,"r":1.411,"z":0.4,"covid":false,"g":"Action,Comedy,Crime","ir":6.5},{"zh":"絕地戰警：生死與共","en":"Bad Boys: Ride or Die","rel":"2024-06-05","tw":80694101,"us":193573217,"exp":92828542,"r":0.869,"z":-0.16,"covid":false,"g":"Action,Adventure,Comedy","ir":6.5},{"zh":"壞蛋聯盟","en":"The Bad Guys","rel":"2022-03-12","tw":17550325,"us":97459240,"exp":57955960,"r":0.303,"z":-1.38,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.9},{"zh":"壞蛋聯盟 2","en":"The Bad Guys 2","rel":"2025-07-26","tw":17429492,"us":82593605,"exp":51731725,"r":0.337,"z":-1.25,"covid":false,"g":"Action,Adventure,Animation","ir":7.0},{"zh":"捍衛任務：復仇芭蕾","en":"Ballerina","rel":"2025-06-06","tw":77243356,"us":58051327,"exp":40610172,"r":1.902,"z":0.74,"covid":false,"g":"Action,Adventure,Crime","ir":6.8},{"zh":"Barbie芭比","en":"Barbie","rel":"2023-07-20","tw":184069330,"us":636238421,"exp":210102861,"r":0.876,"z":-0.15,"covid":false,"g":"Adventure,Comedy,Fantasy","ir":6.8},{"zh":"蝙蝠俠","en":"The Batman","rel":"2022-03-03","tw":137431475,"us":369345583,"exp":144642732,"r":0.95,"z":-0.06,"covid":false,"g":"Action,Crime,Mystery","ir":7.8},{"zh":"海灘救護隊","en":"Baywatch","rel":"2017-05-25","tw":78800513,"us":58060186,"exp":40614426,"r":1.94,"z":0.76,"covid":false,"g":"Action,Comedy,Crime","ir":5.5},{"zh":"美女與野獸","en":"Beauty and the Beast","rel":"2017-03-16","tw":251334708,"us":504014165,"exp":179051044,"r":1.404,"z":0.39,"covid":false,"g":"Adventure,Family,Fantasy","ir":7.1},{"zh":"蜂刑者","en":"The Beekeeper","rel":"2024-01-12","tw":59578082,"us":66220535,"exp":44451617,"r":1.34,"z":0.34,"covid":false,"g":"Action,Crime,Thriller","ir":6.3},{"zh":"陰間大法師 BEETLEJUICE","en":"Beetlejuice Beetlejuice","rel":"2024-09-05","tw":12572466,"us":294100435,"exp":123702688,"r":0.102,"z":-2.64,"covid":false,"g":"Comedy,Fantasy,Horror","ir":6.6},{"zh":"賓漢","en":"Ben-Hur","rel":"2016-08-18","tw":28193621,"us":26410477,"exp":23650337,"r":1.192,"z":0.2,"covid":false,"g":"Action,Adventure,Drama","ir":5.7},{"zh":"吹夢巨人","en":"The BFG","rel":"2016-08-11","tw":42375194,"us":55483770,"exp":39368449,"r":1.076,"z":0.08,"covid":false,"g":"Adventure,Family,Fantasy","ir":6.3},{"zh":"比利•林恩的中場戰事","en":"Billy Lynn's Long Halftime Walk","rel":"2016-11-11","tw":114147252,"us":1738477,"exp":3653415,"r":31.244,"z":3.97,"covid":false,"g":"Action,Drama,Sport","ir":6.2},{"zh":"猛禽小隊: 小丑女大解放","en":"Birds of Prey and the Fantabulous Emancipation of One Harley Quinn","rel":"2020-02-06","tw":112521772,"us":84158461,"exp":52402575,"r":2.147,"z":0.88,"covid":false,"g":"Action,Comedy,Crime","ir":6.1},{"zh":"黑亞當","en":"Black Adam","rel":"2022-10-19","tw":148174405,"us":168152111,"exp":84276932,"r":1.758,"z":0.65,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.1},{"zh":"黑豹","en":"Black Panther","rel":"2018-02-13","tw":373051577,"us":700059566,"exp":224352468,"r":1.663,"z":0.59,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.3},{"zh":"黑豹 2：瓦干達萬歲","en":"Black Panther: Wakanda Forever","rel":"2022-11-09","tw":250916773,"us":453829060,"exp":166612597,"r":1.506,"z":0.47,"covid":false,"g":"Action,Adventure,Drama","ir":6.6},{"zh":"黑寡婦","en":"Black Widow","rel":"2021-07-14","tw":48008124,"us":183651655,"exp":89535527,"r":0.536,"z":-0.72,"covid":true,"g":"Action,Adventure,Sci-Fi","ir":6.6},{"zh":"銀翼殺手2049","en":"Blade Runner 2049","rel":"2017-10-06","tw":54949277,"us":92054159,"exp":55729820,"r":0.986,"z":-0.02,"covid":false,"g":"Action,Drama,Mystery","ir":8.0},{"zh":"圍雞總動員","en":"Blockers","rel":"2018-04-20","tw":20557103,"us":60311495,"exp":41689046,"r":0.493,"z":-0.82,"covid":false,"g":"Comedy,Drama","ir":6.2},{"zh":"血衛","en":"Bloodshot","rel":"2020-03-12","tw":62391061,"us":12561824,"exp":14200290,"r":4.394,"z":1.71,"covid":true,"g":"Action,Adventure,Drama","ir":5.7},{"zh":"藍甲蟲","en":"Blue Beetle","rel":"2023-08-17","tw":32393156,"us":72488072,"exp":47298559,"r":0.685,"z":-0.44,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.9},{"zh":"波希米亞狂想曲","en":"Bohemian Rhapsody","rel":"2018-11-02","tw":37055008,"us":216428042,"exp":100219805,"r":0.37,"z":-1.15,"covid":false,"g":"Biography,Drama,Music","ir":7.9},{"zh":"重磅腥聞","en":"Bombshell","rel":"2020-01-10","tw":11645324,"us":31762808,"exp":26844349,"r":0.434,"z":-0.96,"covid":false,"g":"Biography,Drama","ir":6.8},{"zh":"寶貝老闆","en":"The Boss Baby","rel":"2017-03-31","tw":98172481,"us":175003033,"exp":86619235,"r":1.133,"z":0.14,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.3},{"zh":"BJ有喜","en":"Bridget Jones's Baby","rel":"2016-09-14","tw":21883030,"us":24252420,"exp":22306088,"r":0.981,"z":-0.02,"covid":false,"g":"Comedy,Drama,Romance","ir":6.4},{"zh":"子彈列車","en":"Bullet Train","rel":"2022-08-03","tw":117574496,"us":103368602,"exp":60345953,"r":1.948,"z":0.77,"covid":false,"g":"Action,Comedy,Thriller","ir":7.3},{"zh":"大黃蜂","en":"Bumblebee","rel":"2018-12-26","tw":155948018,"us":127195589,"exp":69580530,"r":2.241,"z":0.93,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.7},{"zh":"極地守護犬","en":"The Call of the Wild","rel":"2020-02-27","tw":16243937,"us":62342368,"exp":42647698,"r":0.381,"z":-1.11,"covid":false,"g":"Adventure,Drama,Family","ir":6.7},{"zh":"美國隊長:無畏新世界","en":"Captain America: Brave New World","rel":"2025-02-12","tw":102133208,"us":200500001,"exp":95096235,"r":1.074,"z":0.08,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.6},{"zh":"驚奇隊長","en":"Captain Marvel","rel":"2019-03-06","tw":404391001,"us":426829839,"exp":159743045,"r":2.532,"z":1.07,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.7},{"zh":"CARS 3 閃電再起","en":"Cars 3","rel":"2017-08-07","tw":45911373,"us":152901115,"exp":78952013,"r":0.582,"z":-0.62,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.7},{"zh":"CATS 貓","en":"Cats","rel":"2019-12-24","tw":11806161,"us":27166770,"exp":24113190,"r":0.49,"z":-0.82,"covid":false,"g":"Comedy,Drama,Family","ir":2.8},{"zh":"中央情爆員","en":"Central Intelligence","rel":"2016-07-15","tw":36573597,"us":127440871,"exp":69672611,"r":0.525,"z":-0.74,"covid":false,"g":"Action,Comedy,Crime","ir":6.3},{"zh":"霹靂嬌娃","en":"Charlie's Angels","rel":"2019-12-27","tw":28917599,"us":17803077,"exp":18040887,"r":1.603,"z":0.54,"covid":false,"g":"Action,Adventure,Comedy","ir":5.0},{"zh":"恰吉","en":"Child's Play","rel":"2019-06-21","tw":16379249,"us":29208403,"exp":25342984,"r":0.646,"z":-0.5,"covid":false,"g":"Drama,Horror,Sci-Fi","ir":5.7},{"zh":"摯友維尼","en":"Christopher Robin","rel":"2018-08-03","tw":23510154,"us":99215042,"exp":58670710,"r":0.401,"z":-1.05,"covid":false,"g":"Adventure,Comedy,Drama","ir":7.2},{"zh":"帝國浩劫：美國內戰","en":"Civil War","rel":"2024-04-29","tw":22573750,"us":68756072,"exp":45613106,"r":0.495,"z":-0.81,"covid":false,"g":"Action,Thriller,War","ir":7.0},{"zh":"可可夜總會","en":"Coco","rel":"2017-11-24","tw":135232352,"us":210460015,"exp":98314394,"r":1.376,"z":0.37,"covid":false,"g":"Adventure,Animation,Drama","ir":8.4},{"zh":"酷寒殺手","en":"Cold Pursuit","rel":"2019-02-27","tw":25052188,"us":32138862,"exp":27062122,"r":0.926,"z":-0.09,"covid":false,"g":"Action,Comedy,Crime","ir":6.2},{"zh":"最美的安排","en":"Collateral Beauty","rel":"2016-12-15","tw":40461215,"us":31016021,"exp":26409472,"r":1.532,"z":0.49,"covid":false,"g":"Drama,Romance","ir":6.8},{"zh":"完美伴侶","en":"Companion","rel":"2025-01-29","tw":24686975,"us":20869122,"exp":20120121,"r":1.227,"z":0.24,"covid":false,"g":"Sci-Fi,Thriller","ir":6.9},{"zh":"厲陰宅2","en":"The Conjuring 2","rel":"2016-06-08","tw":153886868,"us":102470008,"exp":59985342,"r":2.565,"z":1.09,"covid":false,"g":"Horror,Mystery,Thriller","ir":7.3},{"zh":"厲陰宅3：是惡魔逼我的","en":"The Conjuring: The Devil Made Me Do It","rel":"2021-07-22","tw":13715071,"us":65631050,"exp":44179599,"r":0.31,"z":-1.35,"covid":true,"g":"Horror,Mystery,Thriller","ir":6.2},{"zh":"厲陰宅：最終聖事","en":"The Conjuring: Last Rites","rel":"2025-09-03","tw":61551498,"us":177756445,"exp":87552482,"r":0.703,"z":-0.41,"covid":false,"g":"Horror,Mystery,Thriller","ir":6.2},{"zh":"倒數計死","en":"Countdown","rel":"2019-12-27","tw":16619551,"us":25621766,"exp":23163194,"r":0.717,"z":-0.38,"covid":false,"g":"Horror,Thriller","ir":5.4},{"zh":"鱷魔","en":"Crawl","rel":"2019-07-12","tw":28698829,"us":39014193,"exp":30914145,"r":0.928,"z":-0.09,"covid":false,"g":"Action,Horror,Thriller","ir":6.1},{"zh":"瘋狂亞洲富豪","en":"Crazy Rich Asians","rel":"2018-08-24","tw":66386121,"us":174532921,"exp":86459435,"r":0.768,"z":-0.3,"covid":false,"g":"Comedy,Drama,Romance","ir":6.9},{"zh":"A.I.創世者","en":"The Creator","rel":"2023-09-29","tw":34525987,"us":40774679,"exp":31865112,"r":1.084,"z":0.09,"covid":false,"g":"Action,Adventure,Drama","ir":6.7},{"zh":"金牌拳手：父仇","en":"Creed II","rel":"2018-11-30","tw":11493428,"us":115715889,"exp":65206093,"r":0.176,"z":-2.0,"covid":false,"g":"Action,Drama,Sport","ir":7.1},{"zh":"犯罪101","en":"Crime 101","rel":"2026-02-26","tw":10113864,"us":36588336,"exp":29581383,"r":0.342,"z":-1.24,"covid":false,"g":"Crime,Drama,Thriller","ir":6.8},{"zh":"古魯家族：新石代","en":"The Croods: A New Age","rel":"2020-11-27","tw":17228152,"us":58568815,"exp":40858336,"r":0.422,"z":-1.0,"covid":true,"g":"Adventure,Animation,Comedy","ir":6.9},{"zh":"救命解藥","en":"A Cure for Wellness","rel":"2017-02-17","tw":16821197,"us":8106986,"exp":10513206,"r":1.6,"z":0.54,"covid":false,"g":"Drama,Fantasy,Horror","ir":6.4},{"zh":"哭泣的女人","en":"The Curse of La Llorona","rel":"2019-04-17","tw":31268319,"us":54733739,"exp":39002342,"r":0.802,"z":-0.25,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.3},{"zh":"家有兩個爸X2","en":"Daddy's Home 2","rel":"2017-12-01","tw":12200965,"us":104029443,"exp":60610525,"r":0.201,"z":-1.85,"covid":false,"g":"Comedy","ir":6.1},{"zh":"闇黑之心","en":"The Darkest Minds","rel":"2018-08-24","tw":10799761,"us":12695691,"exp":14303999,"r":0.755,"z":-0.32,"covid":false,"g":"Action,Adventure,Drama","ir":5.7},{"zh":"黑塔","en":"The Dark Tower","rel":"2017-08-31","tw":26629578,"us":50701325,"exp":37006268,"r":0.72,"z":-0.38,"covid":false,"g":"Action,Adventure,Drama","ir":5.6},{"zh":"DC超級寵物軍團","en":"DC League of Super-Pets","rel":"2022-08-09","tw":12544161,"us":93657117,"exp":56394190,"r":0.222,"z":-1.73,"covid":false,"g":"Action,Adventure,Animation","ir":6.8},{"zh":"死侍2","en":"Deadpool 2","rel":"2018-05-15","tw":287616545,"us":318491426,"exp":130656926,"r":2.201,"z":0.91,"covid":false,"g":"Action,Adventure,Comedy","ir":7.6},{"zh":"死侍與金鋼狼","en":"Deadpool & Wolverine","rel":"2024-07-24","tw":301308249,"us":636745858,"exp":210217878,"r":1.433,"z":0.41,"covid":false,"g":"Action,Adventure,Comedy","ir":7.5},{"zh":"尼羅河謀殺案","en":"Death on the Nile","rel":"2022-02-11","tw":35388421,"us":45630104,"exp":34423658,"r":1.028,"z":0.03,"covid":false,"g":"Crime,Drama,Mystery","ir":6.3},{"zh":"猛龍怪客","en":"Death Wish","rel":"2018-06-01","tw":12249914,"us":34017028,"exp":28138065,"r":0.435,"z":-0.96,"covid":false,"g":"Action,Crime,Drama","ir":6.3},{"zh":"極盜戰","en":"Den of Thieves","rel":"2018-03-16","tw":23129424,"us":44947622,"exp":34069381,"r":0.679,"z":-0.45,"covid":false,"g":"Action,Crime,Drama","ir":7.0},{"zh":"神偷奶爸3","en":"Despicable Me 3","rel":"2017-06-29","tw":182399115,"us":264624300,"exp":115051829,"r":1.585,"z":0.53,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.3},{"zh":"神偷奶爸 4","en":"Despicable Me 4","rel":"2024-07-03","tw":177602336,"us":361004205,"exp":142392261,"r":1.247,"z":0.25,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.2},{"zh":"穿著Prada的惡魔2","en":"The Devil Wears Prada 2","rel":"2026-04-29","tw":240483582,"us":220556651,"exp":101528311,"r":2.369,"z":0.99,"covid":false,"g":"Comedy,Drama","ir":6.3},{"zh":"揭密日","en":"Disclosure Day","rel":"2026-06-09","tw":56552316,"us":116636645,"exp":65561824,"r":0.863,"z":-0.17,"covid":false,"g":"Action,Mystery,Sci-Fi","ir":6.4},{"zh":"安眠醫生","en":"Doctor Sleep","rel":"2019-11-08","tw":29399074,"us":31581712,"exp":26739188,"r":1.099,"z":0.11,"covid":false,"g":"Drama,Fantasy,Horror","ir":7.3},{"zh":"奇異博士","en":"Doctor Strange","rel":"2016-10-25","tw":299701739,"us":232641920,"exp":105315229,"r":2.846,"z":1.21,"covid":false,"g":"Action,Adventure,Fantasy","ir":7.5},{"zh":"奇異博士2：失控多重宇宙","en":"Doctor Strange in the Multiverse of Madness","rel":"2022-05-04","tw":244509640,"us":411331607,"exp":155738289,"r":1.57,"z":0.52,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.8},{"zh":"狗狗的旅程","en":"A Dog's Journey","rel":"2019-05-17","tw":12440816,"us":22782371,"exp":21368867,"r":0.582,"z":-0.62,"covid":false,"g":"Adventure,Comedy,Drama","ir":7.5},{"zh":"為了與你相遇","en":"A Dog's Purpose","rel":"2017-02-24","tw":69219176,"us":64508620,"exp":43659525,"r":1.585,"z":0.53,"covid":false,"g":"Adventure,Comedy,Drama","ir":7.3},{"zh":"為了與你相聚","en":"A Dog's Way Home","rel":"2019-01-11","tw":18041604,"us":42004346,"exp":32521715,"r":0.555,"z":-0.68,"covid":false,"g":"Adventure,Drama,Family","ir":6.7},{"zh":"杜立德","en":"Dolittle","rel":"2020-01-23","tw":75963417,"us":77047065,"exp":49321037,"r":1.54,"z":0.5,"covid":false,"g":"Adventure,Comedy,Family","ir":5.6},{"zh":"暫時停止呼吸","en":"Don't Breathe","rel":"2016-09-27","tw":41434482,"us":89217875,"exp":54545315,"r":0.76,"z":-0.32,"covid":false,"g":"Crime,Horror,Thriller","ir":7.1},{"zh":"朵拉與失落的黃金城","en":"Dora and the Lost City of Gold","rel":"2019-08-09","tw":14040397,"us":60477943,"exp":41767993,"r":0.336,"z":-1.26,"covid":false,"g":"Action,Adventure,Comedy","ir":6.1},{"zh":"縮小人生","en":"Downsizing","rel":"2018-01-26","tw":32918325,"us":24449754,"exp":22430522,"r":1.468,"z":0.44,"covid":false,"g":"Drama,Fantasy,Sci-Fi","ir":5.8},{"zh":"抓馬戀人","en":"The Drama","rel":"2026-04-02","tw":36947114,"us":48102144,"exp":35693250,"r":1.035,"z":0.04,"covid":false,"g":"Comedy,Drama,Romance","ir":7.1},{"zh":"小飛象","en":"Dumbo","rel":"2019-03-29","tw":86346048,"us":114766307,"exp":64838295,"r":1.332,"z":0.33,"covid":false,"g":"Adventure,Family,Fantasy","ir":6.2},{"zh":"沙丘","en":"Dune","rel":"2021-09-16","tw":156370734,"us":108327830,"exp":62318757,"r":2.509,"z":1.06,"covid":true,"g":"Action,Adventure,Drama","ir":8.0},{"zh":"沙丘：第二部","en":"Dune: Part Two","rel":"2024-02-28","tw":234156556,"us":282144358,"exp":120228102,"r":1.948,"z":0.77,"covid":false,"g":"Action,Adventure,Drama","ir":8.4},{"zh":"龍與地下城：盜賊榮耀","en":"Dungeons & Dragons: Honor Among Thieves","rel":"2023-03-29","tw":95188533,"us":93549650,"exp":56349761,"r":1.689,"z":0.6,"covid":false,"g":"Action,Adventure,Comedy","ir":7.2},{"zh":"敦克爾克大行動","en":"Dunkirk","rel":"2017-07-20","tw":113452124,"us":188045546,"exp":91000591,"r":1.247,"z":0.25,"covid":false,"g":"Action,Drama,History","ir":7.8},{"zh":"元素方城市","en":"Elemental","rel":"2023-06-30","tw":100392930,"us":154426697,"exp":79491938,"r":1.263,"z":0.27,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.0},{"zh":"地球特派員","en":"Elio","rel":"2025-07-02","tw":36777472,"us":72987454,"exp":47522002,"r":0.774,"z":-0.3,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.6},{"zh":"表情符號電影","en":"The Emoji Movie","rel":"2017-08-11","tw":10828163,"us":86089513,"exp":53225047,"r":0.203,"z":-1.84,"covid":false,"g":"Adventure,Animation,Comedy","ir":3.5},{"zh":"魔法滿屋","en":"Encanto","rel":"2021-11-26","tw":26504560,"us":96093622,"exp":57397252,"r":0.462,"z":-0.89,"covid":true,"g":"Animation,Comedy,Family","ir":7.2},{"zh":"橡樹街末日","en":"The End of Oak Street","rel":"2026-08-12","tw":50024611,"us":54185388,"exp":38733683,"r":1.292,"z":0.29,"covid":false,"g":"Action,Adventure","ir":6.2},{"zh":"私刑教育2","en":"The Equalizer 2","rel":"2018-08-30","tw":70227691,"us":102084362,"exp":59830276,"r":1.174,"z":0.18,"covid":false,"g":"Action,Crime,Mystery","ir":6.7},{"zh":"私刑教育3","en":"The Equalizer 3","rel":"2023-08-31","tw":65489599,"us":92373751,"exp":55862568,"r":1.172,"z":0.18,"covid":false,"g":"Action,Crime,Thriller","ir":6.8},{"zh":"密弑遊戲","en":"Escape Room","rel":"2019-02-27","tw":22061612,"us":57005601,"exp":40106559,"r":0.55,"z":-0.69,"covid":false,"g":"Action,Adventure,Horror","ir":6.4},{"zh":"永恆族","en":"Eternals","rel":"2021-11-03","tw":257911788,"us":164870234,"exp":83144300,"r":3.102,"z":1.3,"covid":true,"g":"Action,Adventure,Fantasy","ir":6.2},{"zh":"媽的多重宇宙","en":"Everything Everywhere All at Once","rel":"2022-04-13","tw":74768576,"us":77191785,"exp":49384613,"r":1.514,"z":0.48,"covid":false,"g":"Action,Adventure,Comedy","ir":7.7},{"zh":"鬼玩人：復活","en":"Evil Dead Rise","rel":"2023-04-20","tw":17050768,"us":67233054,"exp":44917079,"r":0.38,"z":-1.12,"covid":false,"g":"Horror","ir":6.5},{"zh":"大法師:信徒","en":"The Exorcist: Believer","rel":"2023-10-06","tw":14292313,"us":65537395,"exp":44136312,"r":0.324,"z":-1.3,"covid":false,"g":"Horror","ir":4.8},{"zh":"F1電影","en":"F1: The Movie","rel":"2025-06-24","tw":573815633,"us":189642436,"exp":91530378,"r":6.269,"z":2.12,"covid":false,"g":"Drama,Sport","ir":7.6},{"zh":"玩命關頭9","en":"F9: The Fast Saga","rel":"2021-08-11","tw":135649127,"us":173005945,"exp":85939456,"r":1.578,"z":0.53,"covid":true,"g":"Action,Crime,Thriller","ir":5.2},{"zh":"特技玩家","en":"The Fall Guy","rel":"2024-04-24","tw":40287225,"us":92900355,"exp":56080987,"r":0.718,"z":-0.38,"covid":false,"g":"Action,Comedy,Drama","ir":6.8},{"zh":"怪獸與牠們的產地","en":"Fantastic Beasts and Where to Find Them","rel":"2016-11-17","tw":309461461,"us":234037575,"exp":105748536,"r":2.926,"z":1.24,"covid":false,"g":"Adventure,Family,Fantasy","ir":7.2},{"zh":"怪獸與葛林戴華德的罪行","en":"Fantastic Beasts: The Crimes of Grindelwald","rel":"2018-11-15","tw":253822295,"us":159555901,"exp":81295112,"r":3.122,"z":1.31,"covid":false,"g":"Adventure,Family,Fantasy","ir":6.5},{"zh":"怪獸與鄧不利多的秘密","en":"Fantastic Beasts: The Secrets of Dumbledore","rel":"2022-04-14","tw":124391432,"us":95850844,"exp":57297666,"r":2.171,"z":0.89,"covid":false,"g":"Adventure,Fantasy","ir":6.2},{"zh":"驚奇4超人：第一步","en":"The Fantastic Four: First Steps","rel":"2025-07-23","tw":70885696,"us":274286610,"exp":117919390,"r":0.601,"z":-0.59,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.8},{"zh":"逃出夢幻島","en":"Fantasy Island","rel":"2020-02-14","tw":22014477,"us":27309289,"exp":24199957,"r":0.91,"z":-0.11,"covid":false,"g":"Fantasy,Horror,Mystery","ir":4.9},{"zh":"玩命關頭:特別行動","en":"Fast & Furious Presents: Hobbs & Shaw","rel":"2019-07-31","tw":454474344,"us":173956935,"exp":86263464,"r":5.268,"z":1.92,"covid":false,"g":"Action,Adventure,Thriller","ir":6.4},{"zh":"玩命關頭 X","en":"Fast X","rel":"2023-05-15","tw":355167929,"us":146126015,"exp":76533458,"r":4.641,"z":1.77,"covid":false,"g":"Action,Adventure,Crime","ir":5.7},{"zh":"玩命關頭8","en":"The Fate of the Furious","rel":"2017-04-12","tw":650779458,"us":226008385,"exp":103244461,"r":6.303,"z":2.12,"covid":false,"g":"Action,Crime,Thriller","ir":6.6},{"zh":"真寵","en":"The Favourite","rel":"2019-01-25","tw":10193205,"us":34366783,"exp":28336349,"r":0.36,"z":-1.18,"covid":false,"g":"Biography,Comedy,Drama","ir":7.5},{"zh":"萌牛費迪南","en":"Ferdinand","rel":"2018-02-15","tw":28738063,"us":84410380,"exp":52510205,"r":0.547,"z":-0.69,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.7},{"zh":"格雷的五十道陰影：束縛","en":"Fifty Shades Darker","rel":"2017-02-10","tw":86912455,"us":114581250,"exp":64766507,"r":1.342,"z":0.34,"covid":false,"g":"Drama,Mystery,Romance","ir":4.6},{"zh":"格雷的五十道陰影：自由","en":"Fifty Shades Freed","rel":"2018-02-09","tw":69564439,"us":100407760,"exp":59153978,"r":1.176,"z":0.19,"covid":false,"g":"Drama,Mystery,Romance","ir":4.6},{"zh":"我和我的摔角家庭","en":"Fighting with My Family","rel":"2019-04-04","tw":11237212,"us":22958886,"exp":21482384,"r":0.523,"z":-0.75,"covid":false,"g":"Biography,Comedy,Drama","ir":7.0},{"zh":"絕命終結站 血脈","en":"Final Destination: Bloodlines","rel":"2025-05-14","tw":87717993,"us":138254739,"exp":73678951,"r":1.191,"z":0.2,"covid":false,"g":"Horror,Thriller","ir":6.7},{"zh":"海底總動員2:多莉去哪兒","en":"Finding Dory","rel":"2016-07-07","tw":162678370,"us":486295561,"exp":174705845,"r":0.931,"z":-0.08,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.2},{"zh":"登月先鋒","en":"First Man","rel":"2018-10-26","tw":15375489,"us":44936545,"exp":34063617,"r":0.451,"z":-0.92,"covid":false,"g":"Biography,Drama,History","ir":7.3},{"zh":"殺戮元年","en":"The First Purge","rel":"2018-08-24","tw":15148704,"us":69488745,"exp":45946216,"r":0.33,"z":-1.28,"covid":false,"g":"Action,Horror,Sci-Fi","ir":5.2},{"zh":"愛上觸不到的你","en":"Five Feet Apart","rel":"2019-03-29","tw":28219672,"us":45729221,"exp":34474971,"r":0.819,"z":-0.23,"covid":false,"g":"Drama,Romance","ir":7.2},{"zh":"佛萊迪餐館之五夜驚魂","en":"Five Nights at Freddy's","rel":"2023-10-27","tw":12069809,"us":137275620,"exp":73320356,"r":0.165,"z":-2.08,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.4},{"zh":"閃電俠","en":"The Flash","rel":"2023-06-14","tw":135385600,"us":108133313,"exp":62241918,"r":2.175,"z":0.9,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.6},{"zh":"別闖陰陽界","en":"Flatliners","rel":"2017-11-03","tw":11484169,"us":16883115,"exp":17395620,"r":0.66,"z":-0.48,"covid":false,"g":"Drama,Horror,Mystery","ir":5.2},{"zh":"賽道狂人","en":"Ford v Ferrari","rel":"2019-11-26","tw":77746258,"us":117624357,"exp":65942445,"r":1.179,"z":0.19,"covid":false,"g":"Action,Biography,Drama","ir":8.1},{"zh":"脫稿玩家","en":"Free Guy","rel":"2021-08-12","tw":73534906,"us":121626598,"exp":67474605,"r":1.09,"z":0.1,"covid":true,"g":"Action,Adventure,Comedy","ir":7.1},{"zh":"冰雪奇緣2","en":"Frozen II","rel":"2019-11-21","tw":343922018,"us":477373578,"exp":172499123,"r":1.994,"z":0.8,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.8},{"zh":"芙莉歐莎：瘋狂麥斯傳奇篇章","en":"Furiosa: A Mad Max Saga","rel":"2024-05-22","tw":54591514,"us":67475791,"exp":45028340,"r":1.212,"z":0.22,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.4},{"zh":"遊戲夜殺必死","en":"Game Night","rel":"2018-02-27","tw":20348398,"us":69179066,"exp":45805555,"r":0.444,"z":-0.94,"covid":false,"g":"Action,Adventure,Comedy","ir":6.9},{"zh":"加菲貓：農場大冒險","en":"The Garfield Movie","rel":"2024-06-07","tw":17384263,"us":91956547,"exp":55689247,"r":0.312,"z":-1.34,"covid":false,"g":"Adventure,Animation,Comedy","ir":5.7},{"zh":"雙子殺手","en":"Gemini Man","rel":"2019-10-23","tw":132187701,"us":48546770,"exp":35919407,"r":3.68,"z":1.5,"covid":false,"g":"Action,Sci-Fi,Thriller","ir":5.7},{"zh":"紳士追殺令","en":"The Gentlemen","rel":"2020-01-23","tw":22385742,"us":36471795,"exp":29516670,"r":0.758,"z":-0.32,"covid":false,"g":"Action,Comedy,Crime","ir":7.8},{"zh":"氣象戰","en":"Geostorm","rel":"2017-10-13","tw":241199241,"us":33700160,"exp":27957874,"r":8.627,"z":2.48,"covid":false,"g":"Action,Sci-Fi,Thriller","ir":5.4},{"zh":"逃出絕命鎮","en":"Get Out","rel":"2017-04-21","tw":54284576,"us":176040665,"exp":86971469,"r":0.624,"z":-0.54,"covid":false,"g":"Horror,Mystery,Thriller","ir":7.8},{"zh":"魔鬼剋星：未來世","en":"Ghostbusters: Afterlife","rel":"2021-12-31","tw":10425268,"us":129360575,"exp":70391380,"r":0.148,"z":-2.2,"covid":true,"g":"Adventure,Comedy,Fantasy","ir":7.0},{"zh":"魔鬼剋星：冰天凍地","en":"Ghostbusters: Frozen Empire","rel":"2024-03-22","tw":10071783,"us":113376590,"exp":64298296,"r":0.157,"z":-2.14,"covid":false,"g":"Action,Adventure,Comedy","ir":6.1},{"zh":"攻殼機動隊","en":"Ghost in the Shell","rel":"2017-03-30","tw":84698846,"us":40563557,"exp":31751759,"r":2.668,"z":1.13,"covid":false,"g":"Action,Crime,Drama","ir":6.3},{"zh":"天才的禮物","en":"Gifted","rel":"2017-04-28","tw":33830117,"us":24801212,"exp":22651366,"r":1.494,"z":0.46,"covid":false,"g":"Drama","ir":7.6},{"zh":"蜘蛛網中的女孩","en":"The Girl in the Spider's Web","rel":"2018-11-09","tw":12011597,"us":14841338,"exp":15922513,"r":0.754,"z":-0.32,"covid":false,"g":"Action,Adventure,Crime","ir":6.1},{"zh":"列車上的女孩","en":"The Girl on the Train","rel":"2016-10-07","tw":27618717,"us":75395035,"exp":48592608,"r":0.568,"z":-0.65,"covid":false,"g":"Crime,Drama,Mystery","ir":6.5},{"zh":"神鬼戰士 2","en":"Gladiator II","rel":"2024-11-14","tw":59953851,"us":172438016,"exp":85745692,"r":0.699,"z":-0.41,"covid":false,"g":"Adventure,Drama","ir":6.4},{"zh":"異裂","en":"Glass","rel":"2019-01-16","tw":92205911,"us":111048468,"exp":63388985,"r":1.455,"z":0.43,"covid":false,"g":"Drama,Fantasy,Horror","ir":6.6},{"zh":"山羊巔峰","en":"GOAT","rel":"2026-02-13","tw":30016261,"us":103316898,"exp":60325230,"r":0.498,"z":-0.8,"covid":false,"g":"Action,Animation,Comedy","ir":6.6},{"zh":"哥吉拉II怪獸之王","en":"Godzilla: King of the Monsters","rel":"2019-05-29","tw":259835598,"us":110500138,"exp":63173954,"r":4.113,"z":1.63,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.0},{"zh":"哥吉拉大戰金剛","en":"Godzilla vs. Kong","rel":"2021-03-24","tw":358028088,"us":100916094,"exp":59359398,"r":6.032,"z":2.07,"covid":true,"g":"Action,Sci-Fi,Thriller","ir":6.3},{"zh":"哥吉拉與金剛 : 新帝國","en":"Godzilla X Kong: The New Empire","rel":"2024-03-27","tw":246559764,"us":196350016,"exp":93740618,"r":2.63,"z":1.11,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.0},{"zh":"捍衛天使","en":"Good Fortune","rel":"2025-10-17","tw":10038369,"us":16585758,"exp":17184711,"r":0.584,"z":-0.62,"covid":false,"g":"Comedy,Fantasy,Romance","ir":6.4},{"zh":"怪物遊戲2：妖獸讚","en":"Goosebumps 2: Haunted Halloween","rel":"2018-10-19","tw":10616592,"us":46700633,"exp":34976043,"r":0.304,"z":-1.37,"covid":false,"g":"Adventure,Comedy,Fantasy","ir":5.6},{"zh":"GT：跨界玩家","en":"Gran Turismo","rel":"2023-08-03","tw":58408460,"us":44428554,"exp":33798803,"r":1.728,"z":0.63,"covid":false,"g":"Action,Adventure,Drama","ir":7.1},{"zh":"大娛樂家","en":"The Greatest Showman","rel":"2017-12-20","tw":91804012,"us":174340174,"exp":86393878,"r":1.063,"z":0.07,"covid":false,"g":"Biography,Drama,Musical","ir":7.5},{"zh":"長城","en":"The Great Wall","rel":"2016-12-29","tw":129314897,"us":45540830,"exp":34377411,"r":3.762,"z":1.53,"covid":false,"g":"Action,Adventure,Fantasy","ir":5.9},{"zh":"幸福綠皮書","en":"Green Book","rel":"2019-01-25","tw":43492877,"us":85080171,"exp":52795878,"r":0.824,"z":-0.22,"covid":false,"g":"Biography,Comedy,Drama","ir":8.2},{"zh":"鬼靈精","en":"The Grinch","rel":"2018-11-09","tw":16570288,"us":271740675,"exp":117166929,"r":0.141,"z":-2.25,"covid":false,"g":"Animation,Comedy,Family","ir":6.4},{"zh":"星際異攻隊2","en":"Guardians of the Galaxy: Vol. 2","rel":"2017-04-27","tw":143562410,"us":389813101,"exp":150098436,"r":0.956,"z":-0.05,"covid":false,"g":"Action,Adventure,Comedy","ir":7.6},{"zh":"星際異攻隊3","en":"Guardians of the Galaxy Vol. 3","rel":"2023-05-03","tw":145357025,"us":358995815,"exp":141847979,"r":1.025,"z":0.03,"covid":false,"g":"Action,Adventure,Comedy","ir":7.9},{"zh":"鋼鐵英雄","en":"Hacksaw Ridge","rel":"2016-11-25","tw":115708566,"us":67209615,"exp":44906329,"r":2.577,"z":1.09,"covid":false,"g":"Biography,Drama,History","ir":8.1},{"zh":"月光光新慌慌","en":"Halloween","rel":"2018-10-19","tw":26061213,"us":159342015,"exp":81220287,"r":0.321,"z":-1.31,"covid":false,"g":"Crime,Drama,Horror","ir":6.5},{"zh":"忌日快樂","en":"Happy Death Day","rel":"2017-10-20","tw":23861248,"us":55683845,"exp":39465847,"r":0.605,"z":-0.58,"covid":false,"g":"Comedy,Horror,Mystery","ir":6.6},{"zh":"祝你忌日快樂","en":"Happy Death Day 2U","rel":"2019-02-14","tw":29789520,"us":28148130,"exp":24707809,"r":1.206,"z":0.22,"covid":false,"g":"Comedy,Horror,Mystery","ir":6.2},{"zh":"幽靈公館","en":"Haunted Mansion","rel":"2023-08-10","tw":11835385,"us":67653287,"exp":45109617,"r":0.262,"z":-1.54,"covid":false,"g":"Comedy,Drama,Family","ir":6.0},{"zh":"威尼斯魅影謀殺案","en":"A Haunting in Venice","rel":"2023-09-15","tw":27236143,"us":42471412,"exp":32769529,"r":0.831,"z":-0.21,"covid":false,"g":"Crime,Drama,Horror","ir":6.5},{"zh":"地獄怪客: 血后的崛起","en":"Hellboy","rel":"2019-04-11","tw":31446642,"us":21903748,"exp":20799661,"r":1.512,"z":0.48,"covid":false,"g":"Action,Adventure,Fantasy","ir":5.3},{"zh":"宿怨","en":"Hereditary","rel":"2018-06-13","tw":26443700,"us":44069456,"exp":33611033,"r":0.787,"z":-0.28,"covid":false,"g":"Drama,Horror,Mystery","ir":7.3},{"zh":"關鍵少數","en":"Hidden Figures","rel":"2017-01-13","tw":60310989,"us":169607287,"exp":84776916,"r":0.711,"z":-0.39,"covid":false,"g":"Biography,Drama,History","ir":7.8},{"zh":"殺手保鑣","en":"The Hitman's Bodyguard","rel":"2017-08-18","tw":91502962,"us":75468583,"exp":48625143,"r":1.882,"z":0.73,"covid":false,"g":"Action,Comedy,Crime","ir":6.9},{"zh":"倒數反擊","en":"Honest Thief","rel":"2020-10-08","tw":47041558,"us":14163574,"exp":15419708,"r":3.051,"z":1.29,"covid":true,"g":"Action,Crime,Drama","ir":6.0},{"zh":"狸想世界","en":"Hoppers","rel":"2026-03-18","tw":288760165,"us":166010783,"exp":83538718,"r":3.457,"z":1.43,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.2},{"zh":"失控危城","en":"Hotel Mumbai","rel":"2019-03-29","tw":33227998,"us":9651611,"exp":11850282,"r":2.804,"z":1.19,"covid":false,"g":"Action,Drama,History","ir":7.6},{"zh":"尖叫旅社3:怪獸假期","en":"Hotel Transylvania 3: Summer Vacation","rel":"2018-07-19","tw":68684970,"us":167510016,"exp":84055883,"r":0.817,"z":-0.23,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.3},{"zh":"GUCCI：豪門謀殺案","en":"House of Gucci","rel":"2022-01-07","tw":18423169,"us":53809574,"exp":38549065,"r":0.478,"z":-0.85,"covid":false,"g":"Biography,Crime,Drama","ir":6.6},{"zh":"滴答屋","en":"The House with a Clock in Its Walls","rel":"2018-10-10","tw":25535431,"us":68549695,"exp":45519076,"r":0.561,"z":-0.67,"covid":false,"g":"Comedy,Family,Fantasy","ir":6.1},{"zh":"馴龍高手","en":"How to Train Your Dragon","rel":"2025-06-07","tw":132120779,"us":262958100,"exp":114554043,"r":1.153,"z":0.16,"covid":false,"g":"Action,Adventure,Comedy","ir":7.7},{"zh":"馴龍高手3","en":"How to Train Your Dragon: The Hidden World","rel":"2019-01-30","tw":166731008,"us":160799505,"exp":81729548,"r":2.04,"z":0.82,"covid":false,"g":"Action,Adventure,Animation","ir":7.4},{"zh":"飢餓遊戲：鳴鳥與游蛇之歌","en":"The Hunger Games: The Ballad of Songbirds & Snakes","rel":"2023-11-16","tw":66533017,"us":166350594,"exp":83656064,"r":0.795,"z":-0.26,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.6},{"zh":"潛艦獵殺令","en":"Hunter Killer","rel":"2018-10-26","tw":74729933,"us":15767460,"exp":16598087,"r":4.502,"z":1.73,"covid":false,"g":"Action,Thriller","ir":6.6},{"zh":"玩命颶風","en":"The Hurricane Heist","rel":"2018-03-08","tw":31891977,"us":6115825,"exp":8663796,"r":3.681,"z":1.5,"covid":false,"g":"Action,Adventure,Crime","ir":5.2},{"zh":"詐騙女神","en":"The Hustle","rel":"2019-05-09","tw":84441043,"us":35417038,"exp":28927997,"r":2.919,"z":1.23,"covid":false,"g":"Comedy,Crime","ir":5.5},{"zh":"冰原歷險記:笑星撞地球","en":"Ice Age: Collision Course","rel":"2016-07-22","tw":58417842,"us":64063008,"exp":43452267,"r":1.344,"z":0.34,"covid":false,"g":"Action,Adventure,Animation","ir":5.7},{"zh":"幻幻之交","en":"IF","rel":"2024-05-11","tw":11187977,"us":111375918,"exp":63517238,"r":0.176,"z":-2.0,"covid":false,"g":"Comedy,Drama,Family","ir":6.4},{"zh":"姐就是美！","en":"I Feel Pretty","rel":"2018-05-21","tw":12264655,"us":48795601,"exp":36045691,"r":0.34,"z":-1.24,"covid":false,"g":"Comedy,Romance","ir":5.7},{"zh":"超人特攻隊2","en":"Incredibles 2","rel":"2018-06-27","tw":260566403,"us":608581744,"exp":203789791,"r":1.279,"z":0.28,"covid":false,"g":"Action,Adventure,Animation","ir":7.5},{"zh":"ID4 星際重生","en":"Independence Day: Resurgence","rel":"2016-06-22","tw":203951233,"us":103144286,"exp":60256026,"r":3.385,"z":1.41,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.2},{"zh":"印第安納瓊斯：命運輪盤","en":"Indiana Jones and the Dial of Destiny","rel":"2023-06-29","tw":48402769,"us":174480468,"exp":86441597,"r":0.56,"z":-0.67,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.5},{"zh":"地獄","en":"Inferno","rel":"2016-10-12","tw":89240290,"us":34343574,"exp":28323211,"r":3.151,"z":1.32,"covid":false,"g":"Action,Adventure,Crime","ir":6.2},{"zh":"腦筋急轉彎2","en":"Inside Out 2","rel":"2024-06-13","tw":513568643,"us":652980194,"exp":213882589,"r":2.401,"z":1.01,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.5},{"zh":"陰兒房第4章：鎖命亡靈","en":"Insidious: The Last Key","rel":"2018-01-05","tw":31450071,"us":67745330,"exp":45151738,"r":0.697,"z":-0.42,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.7},{"zh":"陰兒房：穿越陰深處","en":"Insidious: Out of the Further","rel":"2026-08-19","tw":14053714,"us":65399117,"exp":44072364,"r":0.319,"z":-1.32,"covid":false,"g":"Horror,Mystery,Thriller","ir":6.2},{"zh":"陰兒房：鬼門陰深處","en":"Insidious: The Red Door","rel":"2023-07-13","tw":25069520,"us":82156962,"exp":51543828,"r":0.486,"z":-0.83,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.5},{"zh":"速成家庭","en":"Instant Family","rel":"2019-01-11","tw":11226251,"us":67363237,"exp":44976765,"r":0.25,"z":-1.6,"covid":false,"g":"Comedy,Drama","ir":7.3},{"zh":"隱形人","en":"The Invisible Man","rel":"2020-02-27","tw":52563222,"us":70410000,"exp":46363506,"r":1.134,"z":0.14,"covid":false,"g":"Drama,Horror,Mystery","ir":7.1},{"zh":"犬之島","en":"Isle of Dogs","rel":"2018-06-01","tw":12507703,"us":32015231,"exp":26990616,"r":0.463,"z":-0.89,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.8},{"zh":"牠","en":"It","rel":"2017-09-07","tw":116323320,"us":327481748,"exp":133177672,"r":0.873,"z":-0.16,"covid":false,"g":"Horror","ir":7.3},{"zh":"牠 第二章","en":"It: Chapter Two","rel":"2019-09-05","tw":116682166,"us":211593228,"exp":98677484,"r":1.182,"z":0.19,"covid":false,"g":"Drama,Fantasy,Horror","ir":6.5},{"zh":"神隱任務：永不回頭","en":"Jack Reacher: Never Go Back","rel":"2016-10-21","tw":114445766,"us":58697076,"exp":40919738,"r":2.797,"z":1.19,"covid":false,"g":"Action,Thriller","ir":6.2},{"zh":"神鬼認證：傑森包恩","en":"Jason Bourne","rel":"2016-07-28","tw":145098224,"us":162434410,"exp":82299081,"r":1.763,"z":0.65,"covid":false,"g":"Action,Thriller","ir":6.6},{"zh":"凸搥特派員:三度出擊","en":"Johnny English Strikes Again","rel":"2018-09-21","tw":58882015,"us":4412170,"exp":6924123,"r":8.504,"z":2.47,"covid":false,"g":"Action,Adventure,Comedy","ir":6.2},{"zh":"捍衛任務2：殺神回歸","en":"John Wick: Chapter 2","rel":"2017-02-10","tw":84883420,"us":92029184,"exp":55719441,"r":1.523,"z":0.49,"covid":false,"g":"Action,Crime,Thriller","ir":7.4},{"zh":"捍衛任務3：全面開戰","en":"John Wick: Chapter 3 - Parabellum","rel":"2019-05-15","tw":142800045,"us":171015687,"exp":85259549,"r":1.675,"z":0.59,"covid":false,"g":"Action,Crime,Thriller","ir":7.4},{"zh":"捍衛任務4","en":"John Wick: Chapter 4","rel":"2023-03-22","tw":227143631,"us":187131806,"exp":90696813,"r":2.504,"z":1.06,"covid":false,"g":"Action,Crime,Thriller","ir":7.6},{"zh":"兔嘲男孩","en":"Jojo Rabbit","rel":"2020-01-03","tw":21105078,"us":33370906,"exp":27770075,"r":0.76,"z":-0.32,"covid":false,"g":"Comedy,Drama,War","ir":7.9},{"zh":"小丑","en":"Joker","rel":"2019-10-03","tw":332655822,"us":335451311,"exp":135394123,"r":2.457,"z":1.04,"covid":false,"g":"Drama","ir":8.3},{"zh":"小丑：雙重瘋狂","en":"Joker: Folie à Deux","rel":"2024-10-02","tw":78583170,"us":58300287,"exp":40729648,"r":1.929,"z":0.76,"covid":false,"g":"Drama,Musical,Thriller","ir":5.2},{"zh":"野蠻遊戲：全面晉級","en":"Jumanji: The Next Level","rel":"2019-12-04","tw":190903336,"us":320314960,"exp":131170002,"r":1.455,"z":0.43,"covid":false,"g":"Action,Adventure,Comedy","ir":6.6},{"zh":"野蠻遊戲：瘋狂叢林","en":"Jumanji: Welcome to the Jungle","rel":"2017-12-27","tw":202678565,"us":404515480,"exp":153962065,"r":1.316,"z":0.32,"covid":false,"g":"Action,Adventure,Comedy","ir":6.9},{"zh":"叢林奇航","en":"Jungle Cruise","rel":"2021-07-30","tw":15845123,"us":116987516,"exp":65697150,"r":0.241,"z":-1.64,"covid":true,"g":"Action,Adventure,Comedy","ir":6.5},{"zh":"侏羅紀世界: 統霸天下","en":"Jurassic World: Dominion","rel":"2022-06-08","tw":334165457,"us":376851080,"exp":146654099,"r":2.279,"z":0.95,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.6},{"zh":"侏羅紀世界:殞落國度","en":"Jurassic World: Fallen Kingdom","rel":"2018-06-06","tw":621672249,"us":417719760,"exp":157394627,"r":3.95,"z":1.58,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.2},{"zh":"侏羅紀世界：重生","en":"Jurassic World: Rebirth","rel":"2025-07-01","tw":299255311,"us":339640400,"exp":136552540,"r":2.192,"z":0.9,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.8},{"zh":"正義聯盟","en":"Justice League","rel":"2017-11-16","tw":245199459,"us":229024295,"exp":104188257,"r":2.353,"z":0.99,"covid":false,"g":"Sci-Fi","ir":6.0},{"zh":"不完美的正義","en":"Just Mercy","rel":"2020-01-17","tw":10982882,"us":36001502,"exp":29254862,"r":0.375,"z":-1.13,"covid":false,"g":"Biography,Crime,Drama","ir":7.6},{"zh":"花月殺手","en":"Killers of the Flower Moon","rel":"2023-10-20","tw":19322417,"us":68035488,"exp":45284405,"r":0.427,"z":-0.98,"covid":false,"g":"Crime,Drama,History","ir":7.5},{"zh":"亞瑟：王者之劍","en":"King Arthur: Legend of the Sword","rel":"2017-05-11","tw":49271308,"us":39175066,"exp":31001595,"r":1.589,"z":0.53,"covid":false,"g":"Action,Adventure,Drama","ir":6.7},{"zh":"猩球崛起：王國誕生","en":"Kingdom of the Planet of the Apes","rel":"2024-05-08","tw":99571012,"us":171130165,"exp":85298724,"r":1.167,"z":0.18,"covid":false,"g":"Action,Adventure,Drama","ir":6.8},{"zh":"萬王之王","en":"The King of Kings","rel":"2025-04-18","tw":15251608,"us":60270106,"exp":41669404,"r":0.366,"z":-1.16,"covid":false,"g":"Animation,Biography,Family","ir":6.8},{"zh":"金牌特務：金士曼起源","en":"The King's Man","rel":"2021-12-30","tw":155281462,"us":37176373,"exp":29906930,"r":5.192,"z":1.9,"covid":true,"g":"Action,Adventure,Thriller","ir":6.3},{"zh":"金牌特務：機密對決","en":"Kingsman: The Golden Circle","rel":"2017-09-20","tw":333487810,"us":100234838,"exp":59084025,"r":5.644,"z":1.99,"covid":false,"g":"Action,Adventure,Comedy","ir":6.7},{"zh":"鋒迴路轉","en":"Knives Out","rel":"2019-11-28","tw":38494724,"us":165363234,"exp":83314891,"r":0.462,"z":-0.89,"covid":false,"g":"Comedy,Crime,Drama","ir":7.9},{"zh":"金剛：骷髏島","en":"Kong: Skull Island","rel":"2017-03-09","tw":256562230,"us":168052812,"exp":84242764,"r":3.046,"z":1.28,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.7},{"zh":"獵人克萊文","en":"Kraven the Hunter","rel":"2024-12-13","tw":14461250,"us":25026310,"exp":22792295,"r":0.634,"z":-0.52,"covid":false,"g":"Action,Adventure,Thriller","ir":5.5},{"zh":"功夫熊貓 4","en":"Kung Fu Panda 4","rel":"2024-03-23","tw":48360145,"us":193590620,"exp":92834271,"r":0.521,"z":-0.75,"covid":false,"g":"Action,Adventure,Animation","ir":6.3},{"zh":"樂來越愛你","en":"La La Land","rel":"2016-12-09","tw":132621642,"us":151101803,"exp":78313036,"r":1.693,"z":0.61,"covid":false,"g":"Comedy,Drama,Music","ir":8.0},{"zh":"去年聖誕節","en":"Last Christmas","rel":"2019-12-06","tw":21755860,"us":35150750,"exp":28778513,"r":0.756,"z":-0.32,"covid":false,"g":"Comedy,Drama,Fantasy","ir":6.5},{"zh":"李克寧 墓乃伊","en":"Lee Cronin's The Mummy","rel":"2026-04-15","tw":34263695,"us":29152113,"exp":25309447,"r":1.354,"z":0.35,"covid":false,"g":"Horror","ir":6.1},{"zh":"泰山傳奇","en":"The Legend of Tarzan","rel":"2016-06-29","tw":90068925,"us":126643061,"exp":69372901,"r":1.298,"z":0.3,"covid":false,"g":"Action,Adventure,Drama","ir":6.2},{"zh":"樂高蝙蝠俠電影","en":"The Lego Batman Movie","rel":"2017-02-08","tw":23193368,"us":175750384,"exp":86872996,"r":0.267,"z":-1.52,"covid":false,"g":"Action,Adventure,Animation","ir":7.3},{"zh":"樂高旋風忍者電影","en":"The Lego Ninjago Movie","rel":"2017-10-06","tw":16544482,"us":59281555,"exp":41199013,"r":0.402,"z":-1.05,"covid":false,"g":"Action,Adventure,Animation","ir":6.1},{"zh":"異星智慧","en":"Life","rel":"2017-03-23","tw":28147019,"us":30234022,"exp":25950555,"r":1.085,"z":0.09,"covid":false,"g":"Horror,Sci-Fi,Thriller","ir":6.6},{"zh":"鬼關燈","en":"Lights Out","rel":"2016-07-21","tw":47274191,"us":67268835,"exp":44933488,"r":1.052,"z":0.06,"covid":false,"g":"Documentary","ir":null},{"zh":"巴斯光年","en":"Lightyear","rel":"2022-06-17","tw":42101042,"us":118307188,"exp":66204993,"r":0.636,"z":-0.52,"covid":false,"g":"Action,Adventure,Animation","ir":6.1},{"zh":"星際寶貝：史迪奇","en":"Lilo & Stitch","rel":"2025-05-22","tw":105651491,"us":423778855,"exp":158958322,"r":0.665,"z":-0.47,"covid":false,"g":"Action,Adventure,Comedy","ir":6.7},{"zh":"獅子王","en":"The Lion King","rel":"2019-07-17","tw":314852832,"us":543638043,"exp":188598895,"r":1.669,"z":0.59,"covid":false,"g":"Adventure,Animation,Drama","ir":6.8},{"zh":"小美人魚","en":"The Little Mermaid","rel":"2023-05-24","tw":49400294,"us":298172056,"exp":124875787,"r":0.396,"z":-1.07,"covid":false,"g":"Animation,Comedy,Drama","ir":3.2},{"zh":"細物警探","en":"The Little Things","rel":"2021-01-28","tw":10885177,"us":15342746,"exp":16289862,"r":0.668,"z":-0.46,"covid":true,"g":"Crime,Mystery,Thriller","ir":6.3},{"zh":"她們","en":"Little Women","rel":"2020-01-22","tw":21852523,"us":108101214,"exp":62229234,"r":0.351,"z":-1.21,"covid":false,"g":"Drama,Romance","ir":7.7},{"zh":"羅根","en":"Logan","rel":"2017-02-28","tw":221478181,"us":226277068,"exp":103328702,"r":2.143,"z":0.88,"covid":false,"g":"Action,Drama,Sci-Fi","ir":8.1},{"zh":"長腿","en":"Longlegs","rel":"2024-07-12","tw":11801688,"us":74346140,"exp":48127522,"r":0.245,"z":-1.62,"covid":false,"g":"Crime,Horror,Mystery","ir":6.5},{"zh":"失落謎城","en":"The Lost City","rel":"2022-04-08","tw":23218083,"us":105344029,"exp":61135267,"r":0.38,"z":-1.12,"covid":false,"g":"Action,Adventure,Comedy","ir":6.1},{"zh":"親愛的初戀","en":"Love, Simon","rel":"2018-05-04","tw":13303695,"us":40826341,"exp":31892822,"r":0.417,"z":-1.01,"covid":false,"g":"Comedy,Drama,Romance","ir":7.5},{"zh":"路卡的夏天","en":"Luca","rel":"2021-08-06","tw":10485058,"us":1324302,"exp":3030893,"r":3.459,"z":1.43,"covid":true,"g":"Adventure,Animation,Comedy","ir":7.4},{"zh":"窒友梅根","en":"M3GAN","rel":"2023-01-13","tw":44012812,"us":95159005,"exp":57013442,"r":0.772,"z":-0.3,"covid":false,"g":"Horror,Sci-Fi,Thriller","ir":6.3},{"zh":"窒友梅根 2.0","en":"M3GAN 2.0","rel":"2025-06-27","tw":12376095,"us":24101280,"exp":22210567,"r":0.557,"z":-0.67,"covid":false,"g":"Action,Horror,Sci-Fi","ir":6.0},{"zh":"恐怖大媽","en":"Ma","rel":"2019-05-31","tw":17802279,"us":45896028,"exp":34561248,"r":0.515,"z":-0.76,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.6},{"zh":"蜘蛛夫人","en":"Madame Web","rel":"2024-02-14","tw":21057728,"us":43817106,"exp":33478794,"r":0.629,"z":-0.53,"covid":false,"g":"Action,Thriller","ir":4.1},{"zh":"絕地7騎士","en":"The Magnificent Seven","rel":"2016-10-07","tw":14176197,"us":93432655,"exp":56301375,"r":0.252,"z":-1.59,"covid":false,"g":"Action,Adventure,Drama","ir":6.9},{"zh":"黑魔女2","en":"Maleficent: Mistress of Evil","rel":"2019-10-17","tw":137154951,"us":113929605,"exp":64513427,"r":2.126,"z":0.87,"covid":false,"g":"Adventure,Drama,Family","ir":6.6},{"zh":"媽媽咪呀！回來了","en":"Mamma Mia! Here We Go Again","rel":"2018-08-01","tw":25276673,"us":120634935,"exp":67096464,"r":0.377,"z":-1.13,"covid":false,"g":"Comedy,Musical,Romance","ir":6.6},{"zh":"超難搞先生","en":"A Man Called Otto","rel":"2023-01-23","tw":11308817,"us":64267657,"exp":43547507,"r":0.26,"z":-1.55,"covid":false,"g":"Comedy,Drama","ir":7.5},{"zh":"海邊的曼徹斯特","en":"Manchester by the Sea","rel":"2017-01-26","tw":11636685,"us":47695371,"exp":35485771,"r":0.328,"z":-1.29,"covid":false,"g":"Drama","ir":7.8},{"zh":"曼達洛人與古古","en":"Star Wars: The Mandalorian and Grogu","rel":"2026-05-20","tw":32348873,"us":177730060,"exp":87543560,"r":0.37,"z":-1.15,"covid":false,"g":"Action,Adventure,Family","ir":6.8},{"zh":"捍衛救援","en":"The Marksman","rel":"2021-01-20","tw":12529966,"us":15566093,"exp":16452279,"r":0.762,"z":-0.31,"covid":true,"g":"Action,Drama,Thriller","ir":5.7},{"zh":"驚奇隊長 2","en":"The Marvels","rel":"2023-11-08","tw":91487752,"us":84500223,"exp":52548565,"r":1.741,"z":0.64,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.4},{"zh":"愛‧滿人間","en":"Mary Poppins Returns","rel":"2019-02-01","tw":18135124,"us":171958438,"exp":85581917,"r":0.212,"z":-1.79,"covid":false,"g":"Adventure,Comedy,Family","ir":6.6},{"zh":"太空超人","en":"Masters of the Universe","rel":"2026-05-27","tw":13638297,"us":64830245,"exp":43808837,"r":0.311,"z":-1.35,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.4},{"zh":"天作之合","en":"Materialists","rel":"2025-08-23","tw":12831923,"us":36521973,"exp":29544540,"r":0.434,"z":-0.96,"covid":false,"g":"Comedy,Drama,Romance","ir":6.2},{"zh":"駭客任務：復活","en":"The Matrix Resurrections","rel":"2021-12-22","tw":53713867,"us":37686805,"exp":30188207,"r":1.779,"z":0.66,"covid":true,"g":"Action,Sci-Fi","ir":5.6},{"zh":"移動迷宮：死亡解藥","en":"Maze Runner: The Death Cure","rel":"2018-01-19","tw":173292007,"us":58032443,"exp":40601103,"r":4.268,"z":1.67,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.3},{"zh":"我就要你好好的","en":"Me Before You","rel":"2016-06-17","tw":133253574,"us":56245075,"exp":39738475,"r":3.353,"z":1.39,"covid":false,"g":"Drama,Romance","ir":7.4},{"zh":"極速秒殺2","en":"Mechanic: Resurrection","rel":"2016-08-25","tw":96433922,"us":21218403,"exp":20350685,"r":4.739,"z":1.79,"covid":false,"g":"Action,Adventure,Thriller","ir":5.8},{"zh":"巨齒鯊","en":"The Meg","rel":"2018-08-10","tw":162289851,"us":145443742,"exp":76287975,"r":2.127,"z":0.87,"covid":false,"g":"Action,Adventure,Horror","ir":5.7},{"zh":"巨齒鯊2: 海溝深淵","en":"Meg 2: The Trench","rel":"2023-08-02","tw":120816915,"us":82600317,"exp":51734610,"r":2.335,"z":0.98,"covid":false,"g":"Action,Adventure,Horror","ir":5.0},{"zh":"MIB星際戰警：跨國行動","en":"Men in Black: International","rel":"2019-06-12","tw":94515920,"us":80001807,"exp":50611786,"r":1.867,"z":0.72,"covid":false,"g":"Action,Adventure,Comedy","ir":5.6},{"zh":"五星饗魘","en":"The Menu","rel":"2022-12-02","tw":15257079,"us":38501125,"exp":30634485,"r":0.498,"z":-0.8,"covid":false,"g":"Comedy,Horror,Thriller","ir":7.1},{"zh":"關鍵公敵","en":"Mercy","rel":"2026-01-30","tw":17051264,"us":24390303,"exp":22393067,"r":0.761,"z":-0.31,"covid":false,"g":"Action,Crime,Drama","ir":6.2},{"zh":"麥可傑克森","en":"Michael","rel":"2026-04-22","tw":108099011,"us":372303388,"exp":145436898,"r":0.743,"z":-0.34,"covid":false,"g":"Biography,Drama,History","ir":7.3},{"zh":"米奇17號","en":"Mickey 17","rel":"2025-03-06","tw":56383633,"us":46142263,"exp":34688429,"r":1.625,"z":0.56,"covid":false,"g":"Adventure,Comedy,Fantasy","ir":6.7},{"zh":"決戰中途島","en":"Midway","rel":"2019-11-08","tw":72405781,"us":56846802,"exp":40029830,"r":1.809,"z":0.68,"covid":false,"g":"Action,Drama,History","ir":6.7},{"zh":"飛鴨向前衝","en":"Migration","rel":"2024-01-27","tw":19747287,"us":127630880,"exp":69743905,"r":0.283,"z":-1.45,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.6},{"zh":"拳力逃脫","en":"Mile 22","rel":"2018-08-17","tw":11036862,"us":36108758,"exp":29314664,"r":0.376,"z":-1.13,"covid":false,"g":"Action,Crime,Thriller","ir":6.1},{"zh":"MINECRAFT 麥塊電影","en":"A Minecraft Movie","rel":"2025-04-02","tw":137490519,"us":424087780,"exp":159037859,"r":0.865,"z":-0.17,"covid":false,"g":"Action,Adventure,Comedy","ir":5.6},{"zh":"小小兵&大怪獸","en":"Minions & Monsters","rel":"2026-06-30","tw":107460925,"us":183171260,"exp":89374685,"r":1.202,"z":0.21,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.3},{"zh":"小小兵2:格魯的崛起","en":"Minions: The Rise of Gru","rel":"2022-07-01","tw":147398447,"us":370549695,"exp":144966274,"r":1.017,"z":0.02,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.5},{"zh":"不可能的任務：致命清算 第一章","en":"Mission: Impossible - Dead Reckoning Part One","rel":"2023-07-06","tw":436604877,"us":172640980,"exp":85814962,"r":5.088,"z":1.88,"covid":false,"g":"Action,Adventure,Thriller","ir":7.6},{"zh":"不可能的任務：全面瓦解","en":"Mission: Impossible - Fallout","rel":"2018-07-25","tw":447486435,"us":220159104,"exp":101402650,"r":4.413,"z":1.71,"covid":false,"g":"Action,Adventure,Thriller","ir":7.7},{"zh":"不可能的任務：最終清算","en":"Mission: Impossible - The Final Reckoning","rel":"2025-05-17","tw":453314822,"us":197413515,"exp":94088865,"r":4.818,"z":1.81,"covid":false,"g":"Action,Adventure,Thriller","ir":7.1},{"zh":"怪奇孤兒院","en":"Miss Peregrine's Home for Peculiar Children","rel":"2016-09-27","tw":120678085,"us":87242834,"exp":53713508,"r":2.247,"z":0.93,"covid":false,"g":"Adventure,Drama,Family","ir":6.7},{"zh":"海洋奇緣","en":"Moana","rel":"2017-01-26","tw":107640123,"us":248757044,"exp":110270368,"r":0.976,"z":-0.03,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.6},{"zh":"海洋奇緣","en":"Moana","rel":"2026-07-08","tw":39161167,"us":126229663,"exp":69217369,"r":0.566,"z":-0.66,"covid":false,"g":"Action,Adventure,Comedy","ir":5.8},{"zh":"海洋奇緣2","en":"Moana 2","rel":"2024-11-28","tw":123630179,"us":460405297,"exp":168266207,"r":0.735,"z":-0.36,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.3},{"zh":"決勝女王","en":"Molly's Game","rel":"2018-02-02","tw":30757926,"us":28780744,"exp":25087672,"r":1.226,"z":0.23,"covid":false,"g":"Biography,Crime,Drama","ir":7.4},{"zh":"魔物獵人","en":"Monster Hunter","rel":"2020-12-04","tw":100803483,"us":15162470,"exp":16158226,"r":6.239,"z":2.11,"covid":true,"g":"Action,Adventure,Fantasy","ir":5.2},{"zh":"怪獸卡車","en":"Monster Trucks","rel":"2017-01-13","tw":11613801,"us":33370166,"exp":27769652,"r":0.418,"z":-1.0,"covid":false,"g":"Action,Adventure,Comedy","ir":5.7},{"zh":"月球隕落","en":"Moonfall","rel":"2022-02-03","tw":51057582,"us":19060660,"exp":18906313,"r":2.701,"z":1.15,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.2},{"zh":"魔比斯","en":"Morbius","rel":"2022-04-01","tw":48157458,"us":73865530,"exp":47913731,"r":1.005,"z":0.01,"covid":false,"g":"Action,Adventure,Horror","ir":5.1},{"zh":"移動城市：致命引擎","en":"Mortal Engines","rel":"2018-12-06","tw":60921351,"us":15951040,"exp":16730507,"r":3.641,"z":1.49,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.1},{"zh":"真人快打","en":"Mortal Kombat","rel":"2021-04-08","tw":30017021,"us":42326031,"exp":32692485,"r":0.918,"z":-0.1,"covid":true,"g":"Action,Adventure,Fantasy","ir":6.1},{"zh":"真人快打 II","en":"Mortal Kombat II","rel":"2026-05-06","tw":12748196,"us":79770110,"exp":50511118,"r":0.252,"z":-1.59,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.3},{"zh":"絕處逢山","en":"The Mountain Between Us","rel":"2017-11-10","tw":11820157,"us":30348555,"exp":26017999,"r":0.454,"z":-0.91,"covid":false,"g":"Drama,Thriller","ir":6.4},{"zh":"獅子王：木法沙","en":"Mufasa: The Lion King","rel":"2024-12-19","tw":85926303,"us":254567693,"exp":112032152,"r":0.767,"z":-0.31,"covid":false,"g":"Adventure,Animation,Drama","ir":6.6},{"zh":"賭命運轉手","en":"The Mule","rel":"2019-01-11","tw":15852216,"us":103804407,"exp":60520489,"r":0.262,"z":-1.54,"covid":false,"g":"Crime,Drama,Thriller","ir":7.0},{"zh":"神鬼傳奇","en":"The Mummy","rel":"2017-06-07","tw":286709130,"us":80227895,"exp":50709928,"r":5.654,"z":2.0,"covid":false,"g":"Action,Adventure,Fantasy","ir":5.4},{"zh":"東方快車謀殺案","en":"Murder on the Orient Express","rel":"2017-12-08","tw":94641518,"us":102826543,"exp":60128540,"r":1.574,"z":0.52,"covid":false,"g":"Comedy,Crime,Drama","ir":6.5},{"zh":"玩命航線","en":"Mutiny","rel":"2026-08-19","tw":30134689,"us":15835475,"exp":16647203,"r":1.81,"z":0.68,"covid":false,"g":"Action,Crime,Thriller","ir":5.7},{"zh":"拿破崙","en":"Napoleon","rel":"2023-11-24","tw":44447697,"us":61524375,"exp":42262769,"r":1.052,"z":0.06,"covid":false,"g":"Action,Adventure,Biography","ir":6.3},{"zh":"變種人","en":"The New Mutants","rel":"2020-08-27","tw":18631510,"us":23852659,"exp":22053030,"r":0.845,"z":-0.19,"covid":true,"g":"Action,Horror,Mystery","ir":5.3},{"zh":"夜路","en":"Nightmare Alley","rel":"2022-01-28","tw":10420223,"us":11338107,"exp":13235518,"r":0.787,"z":-0.28,"covid":false,"g":"Crime,Drama,Thriller","ir":7.0},{"zh":"無名弒","en":"Nobody","rel":"2021-04-01","tw":24603483,"us":27568035,"exp":24357122,"r":1.01,"z":0.01,"covid":true,"g":"Action,Crime,Drama","ir":7.4},{"zh":"游牧人生","en":"Nomadland","rel":"2021-03-19","tw":16933107,"us":3700000,"exp":6135978,"r":2.76,"z":1.17,"covid":true,"g":"Drama","ir":7.3},{"zh":"不!","en":"Nope","rel":"2022-08-12","tw":13276893,"us":123277080,"exp":68101833,"r":0.195,"z":-1.88,"covid":false,"g":"Horror,Mystery,Sci-Fi","ir":6.8},{"zh":"007 生死交戰","en":"No Time to Die","rel":"2021-09-29","tw":150946542,"us":160891007,"exp":81761472,"r":1.846,"z":0.71,"covid":true,"g":"Action,Adventure,Thriller","ir":7.3},{"zh":"出神入化2","en":"Now You See Me 2","rel":"2016-06-08","tw":223324834,"us":65075540,"exp":43922557,"r":5.085,"z":1.87,"covid":false,"g":"Action,Adventure,Comedy","ir":6.4},{"zh":"鬼修女","en":"The Nun","rel":"2018-09-06","tw":112677242,"us":117450119,"exp":65875375,"r":1.71,"z":0.62,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.4},{"zh":"鬼修女II","en":"The Nun II","rel":"2023-09-07","tw":54959680,"us":86267073,"exp":53300381,"r":1.031,"z":0.04,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.6},{"zh":"胡桃鉗與奇幻四國","en":"The Nutcracker and the Four Realms","rel":"2018-12-28","tw":23545641,"us":54858851,"exp":39063520,"r":0.603,"z":-0.58,"covid":false,"g":"Adventure,Family,Fantasy","ir":5.6},{"zh":"愛你致死不渝","en":"Obsession","rel":"2026-08-07","tw":135836210,"us":263451715,"exp":114701616,"r":1.184,"z":0.19,"covid":false,"g":"Horror,Thriller","ir":7.8},{"zh":"瞞天過海:八面玲瓏","en":"Ocean's Eight","rel":"2018-06-14","tw":142552086,"us":140218711,"exp":74395850,"r":1.916,"z":0.75,"covid":false,"g":"Comedy,Crime,Thriller","ir":6.3},{"zh":"奧德賽","en":"The Odyssey","rel":"2026-07-16","tw":442082931,"us":618964915,"exp":206170250,"r":2.144,"z":0.88,"covid":false,"g":"Action,Adventure,Fantasy","ir":8.4},{"zh":"從前，有個好萊塢","en":"Once Upon a Time in... Hollywood","rel":"2019-07-24","tw":37481075,"us":142502728,"exp":75225627,"r":0.498,"z":-0.8,"covid":false,"g":"Comedy,Drama","ir":7.6},{"zh":"一戰再戰","en":"One Battle After Another","rel":"2025-09-25","tw":29247619,"us":72918884,"exp":47491350,"r":0.616,"z":-0.56,"covid":false,"g":"Crime,Thriller","ir":7.6},{"zh":"1/2的魔法","en":"Onward","rel":"2020-05-22","tw":63218919,"us":61555145,"exp":42277277,"r":1.495,"z":0.46,"covid":true,"g":"Adventure,Animation,Comedy","ir":7.3},{"zh":"玩命特攻：武演行動","en":"Operation Fortune: Ruse de Guerre","rel":"2023-01-19","tw":41669072,"us":6496125,"exp":9030114,"r":4.614,"z":1.76,"covid":false,"g":"Action,Adventure,Comedy","ir":6.3},{"zh":"奧本海默","en":"Oppenheimer","rel":"2023-07-21","tw":224865473,"us":330078895,"exp":133901815,"r":1.679,"z":0.6,"covid":false,"g":"Biography,Drama,History","ir":8.2},{"zh":"孤兒怨2：最黑暗的過去","en":"Orphan: First Kill","rel":"2022-08-26","tw":18770340,"us":5413227,"exp":7967574,"r":2.356,"z":0.99,"covid":false,"g":"Crime,Drama,Horror","ir":5.9},{"zh":"碟仙：惡靈始源","en":"Ouija: Origin of Evil","rel":"2016-10-21","tw":19558774,"us":35144505,"exp":28775003,"r":0.68,"z":-0.45,"covid":false,"g":"Drama,Horror,Mystery","ir":6.2},{"zh":"大君主行動","en":"Overlord","rel":"2018-11-09","tw":36916136,"us":21704844,"exp":20669817,"r":1.786,"z":0.67,"covid":false,"g":"Action,Horror,Sci-Fi","ir":6.6},{"zh":"環太平洋2: 起義時刻","en":"Pacific Rim: Uprising","rel":"2018-03-21","tw":170746763,"us":59874525,"exp":41481464,"r":4.116,"z":1.63,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.6},{"zh":"星際過客","en":"Passengers","rel":"2016-12-21","tw":74306193,"us":100014699,"exp":58994916,"r":1.26,"z":0.27,"covid":false,"g":"Drama,Romance,Sci-Fi","ir":7.0},{"zh":"汪汪隊立大功：恐龍大電影","en":"PAW Patrol: The Dino Movie","rel":"2026-08-14","tw":39225310,"us":52949549,"exp":38125049,"r":1.029,"z":0.03,"covid":false,"g":"Action,Adventure,Animation","ir":6.1},{"zh":"汪汪隊立大功：超級大電影","en":"PAW Patrol: The Mighty Movie","rel":"2023-09-29","tw":48029806,"us":65343309,"exp":44046543,"r":1.09,"z":0.1,"covid":false,"g":"Action,Adventure,Animation","ir":5.9},{"zh":"汪汪隊立大功電影版","en":"PAW Patrol: The Movie","rel":"2021-09-17","tw":17409993,"us":40127371,"exp":31516980,"r":0.552,"z":-0.68,"covid":true,"g":"Action,Adventure,Animation","ir":6.1},{"zh":"血薄荷","en":"Peppermint","rel":"2018-09-21","tw":15137010,"us":35418723,"exp":28928941,"r":0.523,"z":-0.75,"covid":false,"g":"Action,Thriller","ir":6.5},{"zh":"比得兔","en":"Peter Rabbit","rel":"2018-04-04","tw":27578628,"us":115253424,"exp":65027087,"r":0.424,"z":-0.99,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.6},{"zh":"禁入墳場","en":"Pet Sematary","rel":"2019-04-12","tw":21449157,"us":54724696,"exp":38997918,"r":0.55,"z":-0.69,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.7},{"zh":"加勒比海盜 神鬼奇航：死無對證","en":"Pirates of the Caribbean: Dead Men Tell No Tales","rel":"2017-05-25","tw":228518043,"us":172558876,"exp":85786944,"r":2.664,"z":1.13,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.5},{"zh":"歌喉讚3","en":"Pitch Perfect 3","rel":"2017-12-27","tw":100447547,"us":104897530,"exp":60957270,"r":1.648,"z":0.58,"covid":false,"g":"Comedy,Music","ir":5.8},{"zh":"迫降危機","en":"Plane","rel":"2023-01-25","tw":28590845,"us":32111181,"exp":27046119,"r":1.057,"z":0.06,"covid":false,"g":"Action,Adventure,Drama","ir":6.5},{"zh":"名偵探皮卡丘","en":"Pokémon: Detective Pikachu","rel":"2019-05-09","tw":160741931,"us":144105346,"exp":75805365,"r":2.12,"z":0.87,"covid":false,"g":"Adventure,Comedy,Family","ir":6.5},{"zh":"可憐的東西","en":"Poor Things","rel":"2024-02-08","tw":53031688,"us":34553225,"exp":28441788,"r":1.865,"z":0.72,"covid":false,"g":"Comedy,Drama,Romance","ir":7.7},{"zh":"梵蒂岡驅魔士","en":"The Pope's Exorcist","rel":"2023-04-28","tw":11746811,"us":20009380,"exp":19547373,"r":0.601,"z":-0.59,"covid":false,"g":"Horror,Thriller","ir":6.1},{"zh":"郵報:密戰","en":"The Post","rel":"2018-02-23","tw":25592091,"us":81903458,"exp":51434596,"r":0.498,"z":-0.8,"covid":false,"g":"Biography,Drama,History","ir":7.2},{"zh":"金剛戰士","en":"Power Rangers","rel":"2017-03-24","tw":24863623,"us":85364450,"exp":52916913,"r":0.47,"z":-0.87,"covid":false,"g":"Action,Adventure,Fantasy","ir":5.9},{"zh":"終極戰士：掠奪者","en":"The Predator","rel":"2018-09-14","tw":43561059,"us":51024708,"exp":37168136,"r":1.172,"z":0.18,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.3},{"zh":"終極戰士：殺戮星球","en":"Predator: Badlands","rel":"2025-11-06","tw":52041349,"us":91083631,"exp":55325808,"r":0.941,"z":-0.07,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.2},{"zh":"極限返航","en":"Project Hail Mary","rel":"2026-03-18","tw":172805262,"us":344050007,"exp":137767110,"r":1.254,"z":0.26,"covid":false,"g":"Adventure,Comedy,Sci-Fi","ir":8.2},{"zh":"國定殺戮日：大選之年","en":"The Purge: Election Year","rel":"2016-07-08","tw":22074256,"us":79213375,"exp":50268851,"r":0.439,"z":-0.95,"covid":false,"g":"Action,Adventure,Crime","ir":6.0},{"zh":"鞋貓劍客 2","en":"Puss in Boots: The Last Wish","rel":"2022-09-23","tw":23101371,"us":186090535,"exp":90350068,"r":0.256,"z":-1.57,"covid":false,"g":"Action,Adventure,Animation","ir":7.9},{"zh":"噤界","en":"A Quiet Place","rel":"2018-04-04","tw":72372674,"us":188024361,"exp":90993553,"r":0.795,"z":-0.26,"covid":false,"g":"Drama,Horror,Sci-Fi","ir":7.5},{"zh":"噤界：入侵日","en":"A Quiet Place: Day One","rel":"2024-06-26","tw":54282044,"us":139051884,"exp":73970311,"r":0.734,"z":-0.36,"covid":false,"g":"Drama,Horror,Sci-Fi","ir":6.2},{"zh":"噤界II","en":"A Quiet Place Part II","rel":"2021-08-25","tw":24321874,"us":160072261,"exp":81475624,"r":0.299,"z":-1.39,"covid":true,"g":"Drama,Horror,Sci-Fi","ir":7.2},{"zh":"無敵破壞王2：網路大暴走","en":"Ralph Breaks the Internet","rel":"2018-11-29","tw":139108858,"us":201091711,"exp":95288801,"r":1.46,"z":0.44,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.0},{"zh":"藍波:最後一滴血","en":"Rambo: Last Blood","rel":"2019-10-09","tw":27718061,"us":44819352,"exp":34002609,"r":0.815,"z":-0.24,"covid":false,"g":"Action,Crime,Thriller","ir":6.1},{"zh":"毀滅大作戰","en":"Rampage","rel":"2018-04-12","tw":136885117,"us":101028233,"exp":59404671,"r":2.304,"z":0.96,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.1},{"zh":"尋龍使者：拉雅","en":"Raya and the Last Dragon","rel":"2021-03-05","tw":60812414,"us":54723032,"exp":38997104,"r":1.559,"z":0.51,"covid":true,"g":"Action,Adventure,Animation","ir":7.3},{"zh":"弒婚遊戲","en":"Ready or Not","rel":"2019-10-09","tw":26675467,"us":28714231,"exp":25047857,"r":1.065,"z":0.07,"covid":false,"g":"Comedy,Horror,Mystery","ir":6.9},{"zh":"一級玩家","en":"Ready Player One","rel":"2018-03-29","tw":365858816,"us":137690172,"exp":73472280,"r":4.98,"z":1.85,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.4},{"zh":"紅色一號","en":"Red One","rel":"2024-11-07","tw":49097081,"us":97000759,"exp":57768660,"r":0.85,"z":-0.19,"covid":false,"g":"Action,Adventure,Comedy","ir":6.2},{"zh":"紅雀","en":"Red Sparrow","rel":"2018-02-28","tw":173326463,"us":46874505,"exp":35065383,"r":4.943,"z":1.84,"covid":false,"g":"Drama,Mystery,Thriller","ir":6.6},{"zh":"惡靈古堡：爆發夜","en":"Resident Evil","rel":"2026-09-17","tw":54399697,"us":110613869,"exp":63218582,"r":0.861,"z":-0.17,"covid":false,"g":"Horror","ir":7.6},{"zh":"惡靈古堡：最終章","en":"Resident Evil: The Final Chapter","rel":"2017-01-26","tw":247789829,"us":26830068,"exp":23907633,"r":10.364,"z":2.7,"covid":false,"g":"Action,Horror,Sci-Fi","ir":5.5},{"zh":"惡靈古堡首部曲：拉昆市","en":"Resident Evil: Welcome to Raccoon City","rel":"2021-11-26","tw":48020893,"us":17000612,"exp":17478636,"r":2.747,"z":1.17,"covid":true,"g":"Action,Horror,Sci-Fi","ir":5.2},{"zh":"爆復","en":"Retribution","rel":"2023-08-25","tw":10233773,"us":6937696,"exp":9447121,"r":1.083,"z":0.09,"covid":false,"g":"Action,Mystery,Thriller","ir":5.4},{"zh":"重返沉默之丘","en":"Return to Silent Hill","rel":"2026-01-23","tw":10637434,"us":5544971,"exp":8100185,"r":1.313,"z":0.31,"covid":false,"g":"Drama,Horror,Mystery","ir":4.0},{"zh":"羅賓漢崛起","en":"Robin Hood","rel":"2018-12-20","tw":38993878,"us":30824628,"exp":26297491,"r":1.483,"z":0.45,"covid":false,"g":"Action,Adventure,Drama","ir":5.4},{"zh":"星際大戰外傳：俠盜一號","en":"Rogue One: A Star Wars Story","rel":"2016-12-14","tw":85199341,"us":532177324,"exp":185860418,"r":0.458,"z":-0.9,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.8},{"zh":"女狼嗨到趴","en":"Rough Night","rel":"2017-07-20","tw":11709553,"us":22105643,"exp":20931081,"r":0.559,"z":-0.67,"covid":false,"g":"Comedy","ir":5.3},{"zh":"逃亡遊戲","en":"The Running Man","rel":"2025-11-12","tw":12743643,"us":37815641,"exp":30259014,"r":0.421,"z":-1.0,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.3},{"zh":"奪魂鋸X","en":"Saw X","rel":"2023-09-28","tw":25657399,"us":53607898,"exp":38449825,"r":0.667,"z":-0.47,"covid":false,"g":"Crime,Drama,Horror","ir":6.6},{"zh":"驚聲尖笑","en":"Scary Movie","rel":"2026-06-05","tw":16348130,"us":108277762,"exp":62298983,"r":0.262,"z":-1.54,"covid":false,"g":"Comedy,Horror","ir":4.8},{"zh":"在黑暗中說的鬼故事","en":"Scary Stories to Tell in the Dark","rel":"2019-08-07","tw":52659209,"us":68947075,"exp":45700052,"r":1.152,"z":0.16,"covid":false,"g":"Adventure,Horror,Mystery","ir":6.2},{"zh":"人肉搜索","en":"Searching","rel":"2018-09-28","tw":14028983,"us":26020957,"exp":23410331,"r":0.599,"z":-0.59,"covid":false,"g":"Drama,Mystery,Thriller","ir":7.6},{"zh":"寵物當家","en":"The Secret Life of Pets","rel":"2016-06-29","tw":169914728,"us":368623860,"exp":144448648,"r":1.176,"z":0.19,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.5},{"zh":"寵物當家2","en":"The Secret Life of Pets 2","rel":"2019-06-06","tw":57589899,"us":158980250,"exp":81093657,"r":0.71,"z":-0.39,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.4},{"zh":"絕鯊島","en":"The Shallows","rel":"2016-08-18","tw":23068487,"us":55124043,"exp":39193053,"r":0.589,"z":-0.61,"covid":false,"g":"Drama,Horror,Thriller","ir":6.3},{"zh":"尚氣與十環傳奇","en":"Shang-Chi and the Legend of the Ten Rings","rel":"2021-09-02","tw":149582239,"us":224543292,"exp":102784553,"r":1.455,"z":0.43,"covid":true,"g":"Action,Adventure,Fantasy","ir":7.3},{"zh":"水底情深","en":"The Shape of Water","rel":"2018-02-02","tw":28286724,"us":63859435,"exp":43357433,"r":0.652,"z":-0.49,"covid":false,"g":"Drama,Fantasy,Romance","ir":7.3},{"zh":"沙贊！","en":"Shazam!","rel":"2019-03-29","tw":130871912,"us":140371656,"exp":74451546,"r":1.758,"z":0.65,"covid":false,"g":"Action,Adventure,Comedy","ir":7.0},{"zh":"沙贊！眾神之怒","en":"Shazam! Fury of the Gods","rel":"2023-03-16","tw":31023318,"us":57638006,"exp":40411463,"r":0.768,"z":-0.3,"covid":false,"g":"Action,Adventure,Comedy","ir":5.9},{"zh":"天眼浩劫","en":"Shelter","rel":"2026-02-06","tw":28300232,"us":12805541,"exp":14388846,"r":1.967,"z":0.78,"covid":false,"g":"Action,Thriller","ir":6.1},{"zh":"沉默","en":"Silence","rel":"2017-02-17","tw":15767796,"us":7100177,"exp":9598451,"r":1.643,"z":0.57,"covid":false,"g":"Drama,History","ir":7.2},{"zh":"失蹤網紅","en":"A Simple Favor","rel":"2018-09-14","tw":23768356,"us":53548586,"exp":38420617,"r":0.619,"z":-0.55,"covid":false,"g":"Comedy,Crime,Mystery","ir":6.7},{"zh":"歡樂好聲音","en":"Sing","rel":"2016-12-09","tw":64908809,"us":270395425,"exp":116768444,"r":0.556,"z":-0.68,"covid":false,"g":"Animation,Comedy,Family","ir":7.1},{"zh":"歡樂好聲音 2","en":"Sing 2","rel":"2022-01-28","tw":24053615,"us":162790990,"exp":82423060,"r":0.292,"z":-1.42,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.3},{"zh":"罪人","en":"Sinners","rel":"2025-04-16","tw":31212227,"us":279989632,"exp":119597044,"r":0.261,"z":-1.55,"covid":false,"g":"Horror","ir":7.5},{"zh":"摩天大樓","en":"Skyscraper","rel":"2018-07-12","tw":187915352,"us":68420120,"exp":45459993,"r":4.134,"z":1.64,"covid":false,"g":"Action,Adventure,Thriller","ir":5.8},{"zh":"限時救援","en":"Sleepless","rel":"2017-03-17","tw":10085748,"us":20783704,"exp":20063553,"r":0.503,"z":-0.79,"covid":false,"g":"Action,Crime,Thriller","ir":5.6},{"zh":"小腳怪","en":"Smallfoot","rel":"2018-09-28","tw":21933215,"us":83240103,"exp":52009356,"r":0.422,"z":-1.0,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.6},{"zh":"微笑","en":"Smile","rel":"2022-09-30","tw":25190305,"us":105935048,"exp":61370514,"r":0.41,"z":-1.03,"covid":false,"g":"Horror,Mystery,Thriller","ir":6.5},{"zh":"微笑 2","en":"Smile 2","rel":"2024-10-18","tw":11318711,"us":69012586,"exp":45729856,"r":0.248,"z":-1.61,"covid":false,"g":"Horror,Mystery,Thriller","ir":6.7},{"zh":"白雪公主","en":"Snow White","rel":"2025-03-20","tw":24717434,"us":87203963,"exp":53697078,"r":0.46,"z":-0.89,"covid":false,"g":"Adventure,Family,Fantasy","ir":2.2},{"zh":"星際大戰外傳:韓索羅","en":"Solo: A Star Wars Story","rel":"2018-05-23","tw":29598947,"us":213767512,"exp":99372440,"r":0.298,"z":-1.4,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.9},{"zh":"音速小子","en":"Sonic the Hedgehog","rel":"2020-02-21","tw":24168050,"us":148974665,"exp":77554554,"r":0.312,"z":-1.34,"covid":false,"g":"Action,Adventure,Comedy","ir":6.5},{"zh":"音速小子 2","en":"Sonic the Hedgehog 2","rel":"2022-04-01","tw":15259948,"us":190872904,"exp":91937647,"r":0.166,"z":-2.07,"covid":false,"g":"Action,Adventure,Comedy","ir":6.5},{"zh":"音速小子 3","en":"Sonic the Hedgehog 3","rel":"2024-12-27","tw":31202697,"us":236115100,"exp":106392045,"r":0.293,"z":-1.41,"covid":false,"g":"Action,Adventure,Comedy","ir":6.9},{"zh":"自由之聲","en":"Sound of Freedom","rel":"2023-09-19","tw":10128199,"us":184178046,"exp":89711618,"r":0.113,"z":-2.51,"covid":false,"g":"Biography,Crime,Drama","ir":7.6},{"zh":"蜘蛛人：穿越新宇宙","en":"Spider-Man: Across the Spider-Verse","rel":"2023-06-21","tw":107572653,"us":381311319,"exp":147843428,"r":0.728,"z":-0.37,"covid":false,"g":"Action,Adventure,Animation","ir":8.5},{"zh":"蜘蛛人：重生日","en":"Spider-Man: Brand New Day","rel":"2026-07-28","tw":580149683,"us":951771707,"exp":277015760,"r":2.094,"z":0.85,"covid":false,"g":"Action,Adventure","ir":8.0},{"zh":"蜘蛛人：離家日","en":"Spider-Man: Far from Home","rel":"2019-07-02","tw":379826849,"us":390532085,"exp":150288428,"r":2.527,"z":1.07,"covid":false,"g":"Action,Adventure,Comedy","ir":7.3},{"zh":"蜘蛛人：返校日","en":"Spider-Man: Homecoming","rel":"2017-07-05","tw":295264979,"us":334201140,"exp":135047533,"r":2.186,"z":0.9,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.4},{"zh":"蜘蛛人：新宇宙","en":"Spider-Man: Into the Spider-Verse","rel":"2018-12-13","tw":45632156,"us":190241310,"exp":91728701,"r":0.497,"z":-0.8,"covid":false,"g":"Action,Adventure,Animation","ir":8.4},{"zh":"蜘蛛人：無家日","en":"Spider-Man: No Way Home","rel":"2021-12-15","tw":498216125,"us":804793477,"exp":246885881,"r":2.018,"z":0.81,"covid":true,"g":"Action,Adventure,Fantasy","ir":8.1},{"zh":"變身特務","en":"Spies in Disguise","rel":"2020-01-22","tw":41440597,"us":66757013,"exp":44698516,"r":0.927,"z":-0.09,"covid":false,"g":"Action,Adventure,Animation","ir":6.8},{"zh":"分裂","en":"Split","rel":"2017-02-03","tw":163650691,"us":138291365,"exp":73692349,"r":2.221,"z":0.92,"covid":false,"g":"Horror,Thriller","ir":7.3},{"zh":"海綿寶寶電影版：尋寶大冒險","en":"The SpongeBob Movie: Search for SquarePants","rel":"2025-12-21","tw":11743295,"us":71068170,"exp":46660582,"r":0.252,"z":-1.59,"covid":false,"g":"Adventure,Animation,Comedy","ir":5.7},{"zh":"一個巨星的誕生","en":"A Star Is Born","rel":"2018-10-09","tw":161738033,"us":215288866,"exp":99857386,"r":1.62,"z":0.56,"covid":false,"g":"Drama,Music,Romance","ir":7.6},{"zh":"星際爭霸戰：浩瀚無垠","en":"Star Trek Beyond","rel":"2016-07-21","tw":65782438,"us":158848340,"exp":81047461,"r":0.812,"z":-0.24,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.0},{"zh":"STAR WARS : 天行者的崛起","en":"Star Wars: Episode IX - The Rise of Skywalker","rel":"2019-12-18","tw":82499304,"us":515202542,"exp":181770134,"r":0.454,"z":-0.91,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.3},{"zh":"STAR WARS：最後的絕地武士","en":"Star Wars: Episode VIII - The Last Jedi","rel":"2017-12-13","tw":106018939,"us":620181382,"exp":206448316,"r":0.514,"z":-0.77,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.8},{"zh":"送子鳥","en":"Storks","rel":"2016-10-07","tw":34801730,"us":72679278,"exp":47384169,"r":0.734,"z":-0.36,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.8},{"zh":"STRAY KIDS: THE DOMINATE EXPERIENCE","en":"Stray Kids: The Dominate Experience","rel":"2026-03-13","tw":17511745,"us":7232818,"exp":9721186,"r":1.801,"z":0.68,"covid":false,"g":"Documentary,Music","ir":8.1},{"zh":"懼裂","en":"The Substance","rel":"2024-10-18","tw":22984537,"us":17584795,"exp":17888748,"r":1.285,"z":0.29,"covid":false,"g":"Drama,Horror,Sci-Fi","ir":7.2},{"zh":"自殺突擊隊","en":"Suicide Squad","rel":"2016-08-04","tw":299191054,"us":325100054,"exp":132512018,"r":2.258,"z":0.94,"covid":false,"g":"Action,Adventure,Fantasy","ir":5.9},{"zh":"自殺突擊隊：集結","en":"The Suicide Squad","rel":"2021-08-05","tw":57943687,"us":55817425,"exp":39530814,"r":1.466,"z":0.44,"covid":true,"g":"Action,Adventure,Comedy","ir":7.2},{"zh":"薩利機長：哈德遜奇蹟","en":"Sully","rel":"2016-09-08","tw":98869352,"us":125070033,"exp":68780227,"r":1.437,"z":0.42,"covid":false,"g":"Biography,Drama,History","ir":7.4},{"zh":"超少女","en":"Supergirl","rel":"2026-06-23","tw":19637071,"us":72366532,"exp":47244104,"r":0.416,"z":-1.01,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.8},{"zh":"超人","en":"Superman","rel":"2025-07-08","tw":87968080,"us":354223803,"exp":140550900,"r":0.626,"z":-0.54,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":7.0},{"zh":"超級瑪利歐兄弟電影版","en":"The Super Mario Bros. Movie","rel":"2023-04-05","tw":295460684,"us":574934330,"exp":195986492,"r":1.508,"z":0.47,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.0},{"zh":"超級瑪利歐銀河電影版","en":"The Super Mario Galaxy Movie","rel":"2026-04-01","tw":290755706,"us":429814610,"exp":160509039,"r":1.811,"z":0.68,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.3},{"zh":"貼背戰","en":"Tag","rel":"2018-06-22","tw":32690121,"us":54730625,"exp":39000818,"r":0.838,"z":-0.2,"covid":false,"g":"Action,Comedy","ir":6.5},{"zh":"泰勒絲 | 年代巡迴演唱會電影","en":"Taylor Swift: The Eras Tour","rel":"2023-11-03","tw":31511413,"us":180756269,"exp":88564104,"r":0.356,"z":-1.19,"covid":false,"g":"Documentary,Music,Musical","ir":8.0},{"zh":"忍者龜：破影而出","en":"Teenage Mutant Ninja Turtles: Out of the Shadows","rel":"2016-06-03","tw":68169323,"us":82051601,"exp":51498442,"r":1.324,"z":0.32,"covid":false,"g":"Action,Adventure,Comedy","ir":5.9},{"zh":"TENET天能","en":"Tenet","rel":"2020-08-27","tw":349848005,"us":58504105,"exp":40827342,"r":8.569,"z":2.48,"covid":true,"g":"Action,Sci-Fi,Thriller","ir":7.3},{"zh":"魔鬼終結者：黑暗宿命","en":"Terminator: Dark Fate","rel":"2019-11-07","tw":87615329,"us":62253077,"exp":42605757,"r":2.056,"z":0.83,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.2},{"zh":"雷神索爾：愛與雷霆","en":"Thor: Love and Thunder","rel":"2022-07-06","tw":247473955,"us":343256830,"exp":137549001,"r":1.799,"z":0.68,"covid":false,"g":"Action,Adventure,Comedy","ir":6.1},{"zh":"雷神索爾3：諸神黃昏","en":"Thor: Ragnarok","rel":"2017-10-24","tw":313888269,"us":315058289,"exp":129688460,"r":2.42,"z":1.02,"covid":false,"g":"Action,Adventure,Comedy","ir":7.9},{"zh":"意外","en":"Three Billboards Outside Ebbing, Missouri","rel":"2018-02-09","tw":13262717,"us":54513740,"exp":38894657,"r":0.341,"z":-1.24,"covid":false,"g":"Comedy,Crime,Drama","ir":8.1},{"zh":"雷霆特攻隊","en":"Thunderbolts*","rel":"2025-04-30","tw":104497281,"us":190274328,"exp":91739629,"r":1.139,"z":0.15,"covid":false,"g":"Action,Adventure,Crime","ir":7.1},{"zh":"幸福入場券","en":"Ticket to Paradise","rel":"2022-10-07","tw":17123334,"us":68275985,"exp":45394230,"r":0.377,"z":-1.12,"covid":false,"g":"Comedy,Drama,Romance","ir":6.1},{"zh":"湯姆貓與傑利鼠","en":"Tom & Jerry","rel":"2021-02-10","tw":28299417,"us":46536687,"exp":34891707,"r":0.811,"z":-0.24,"covid":true,"g":"Adventure,Animation,Comedy","ir":5.3},{"zh":"古墓奇兵","en":"Tomb Raider","rel":"2018-03-08","tw":137602724,"us":58250803,"exp":40705914,"r":3.38,"z":1.4,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.3},{"zh":"捍衛戰士: 獨行俠","en":"Top Gun: Maverick","rel":"2022-05-23","tw":740861042,"us":718732821,"exp":228443556,"r":3.243,"z":1.36,"covid":false,"g":"Action,Drama","ir":8.2},{"zh":"玩具總動員 4","en":"Toy Story 4","rel":"2019-06-20","tw":312715035,"us":434038008,"exp":161590063,"r":1.935,"z":0.76,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.6},{"zh":"玩具總動員5","en":"Toy Story 5","rel":"2026-06-17","tw":285659641,"us":480291180,"exp":173222161,"r":1.649,"z":0.58,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.3},{"zh":"變形金剛5：最終騎士","en":"Transformers: The Last Knight","rel":"2017-06-21","tw":217382257,"us":130168683,"exp":70692948,"r":3.075,"z":1.29,"covid":false,"g":"Action,Adventure,Comedy","ir":5.2},{"zh":"變形金剛：源起","en":"Transformers One","rel":"2024-09-13","tw":35333267,"us":59098421,"exp":41111601,"r":0.859,"z":-0.17,"covid":false,"g":"Action,Adventure,Animation","ir":7.6},{"zh":"變形金剛：萬獸崛起","en":"Transformers: Rise of the Beasts","rel":"2023-06-07","tw":150572665,"us":157341749,"exp":80518989,"r":1.87,"z":0.72,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.0},{"zh":"圈套","en":"Trap","rel":"2024-08-01","tw":12573735,"us":42777281,"exp":32931352,"r":0.382,"z":-1.11,"covid":false,"g":"Sci-Fi,Thriller","ir":3.0},{"zh":"魔髮精靈","en":"Trolls","rel":"2016-11-04","tw":13135212,"us":153856089,"exp":79290188,"r":0.166,"z":-2.07,"covid":false,"g":"Adventure,Animation,Comedy","ir":6.4},{"zh":"創：戰神","en":"Tron: Ares","rel":"2025-10-08","tw":39799596,"us":73161014,"exp":47599548,"r":0.836,"z":-0.21,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.1},{"zh":"真心話大冒險","en":"Truth or Dare","rel":"2018-05-11","tw":50168372,"us":41411015,"exp":32205659,"r":1.558,"z":0.51,"covid":false,"g":"Horror,Mystery,Thriller","ir":5.3},{"zh":"龍捲風暴","en":"Twisters","rel":"2024-07-17","tw":87544478,"us":267762265,"exp":115986653,"r":0.755,"z":-0.32,"covid":false,"g":"Action,Adventure,Thriller","ir":6.5},{"zh":"秘境探險","en":"Uncharted","rel":"2022-02-17","tw":75710509,"us":148648820,"exp":77438067,"r":0.978,"z":-0.03,"covid":false,"g":"Action,Adventure","ir":6.3},{"zh":"深海終劫站","en":"Underwater","rel":"2020-01-22","tw":40578800,"us":17291078,"exp":17683094,"r":2.295,"z":0.96,"covid":false,"g":"Action,Adventure,Horror","ir":5.9},{"zh":"決戰異世界：弒血之戰","en":"Underworld: Blood Wars","rel":"2016-12-01","tw":47920666,"us":30353973,"exp":26021188,"r":1.842,"z":0.7,"covid":false,"g":"Action,Fantasy,Thriller","ir":5.8},{"zh":"超危險駕駛","en":"Unhinged","rel":"2020-07-29","tw":19985747,"us":20831465,"exp":20095192,"r":0.995,"z":-0.01,"covid":true,"g":"Action,Thriller","ir":6.0},{"zh":"我們","en":"Us","rel":"2019-03-22","tw":63212121,"us":175084580,"exp":86646940,"r":0.73,"z":-0.36,"covid":false,"g":"Horror,Mystery,Thriller","ir":6.8},{"zh":"猛毒","en":"Venom","rel":"2018-10-03","tw":277950798,"us":213515506,"exp":99292007,"r":2.799,"z":1.19,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":6.6},{"zh":"猛毒最終章：最後一舞","en":"Venom: The Last Dance","rel":"2024-10-23","tw":124042094,"us":139755882,"exp":74227191,"r":1.671,"z":0.59,"covid":false,"g":"Action,Fantasy,Horror","ir":6.0},{"zh":"猛毒2：血蜘蛛","en":"Venom: Let There Be Carnage","rel":"2021-10-13","tw":154339442,"us":213550366,"exp":99303135,"r":1.554,"z":0.51,"covid":true,"g":"Action,Adventure,Crime","ir":5.9},{"zh":"魔獸：崛起","en":"Warcraft","rel":"2016-06-08","tw":157374868,"us":47365290,"exp":35317002,"r":4.456,"z":1.72,"covid":false,"g":"Action,Adventure,Fantasy","ir":6.7},{"zh":"火線掏寶","en":"War Dogs","rel":"2016-08-25","tw":11112195,"us":43034523,"exp":33067169,"r":0.336,"z":-1.26,"covid":false,"g":"Biography,Comedy,Crime","ir":7.1},{"zh":"猩球崛起：終極決戰","en":"War for the Planet of the Apes","rel":"2017-07-13","tw":161369568,"us":146880162,"exp":76804384,"r":2.101,"z":0.86,"covid":false,"g":"Action,Adventure,Drama","ir":7.4},{"zh":"阿公當家","en":"The War with Grandpa","rel":"2020-09-30","tw":17098976,"us":21277892,"exp":20389835,"r":0.839,"z":-0.2,"covid":true,"g":"Comedy,Drama,Family","ir":5.7},{"zh":"凶器","en":"Weapons","rel":"2025-08-08","tw":25237407,"us":151572492,"exp":78480418,"r":0.322,"z":-1.31,"covid":false,"g":"Horror,Mystery","ir":7.4},{"zh":"我的鯨魚老爸","en":"The Whale","rel":"2023-02-02","tw":10699271,"us":17463630,"exp":17804043,"r":0.601,"z":-0.59,"covid":false,"g":"Drama","ir":7.6},{"zh":"惱爸偏頭痛","en":"Why Him?","rel":"2016-12-23","tw":33907602,"us":60323786,"exp":41694878,"r":0.813,"z":-0.24,"covid":false,"g":"Comedy","ir":6.2},{"zh":"魔法壞女巫","en":"Wicked","rel":"2024-11-21","tw":62399715,"us":474983975,"exp":171905901,"r":0.363,"z":-1.17,"covid":false,"g":"Fantasy,Musical,Romance","ir":7.3},{"zh":"魔法壞女巫：第二部","en":"Wicked: For Good","rel":"2025-11-19","tw":41785221,"us":342915090,"exp":137454980,"r":0.304,"z":-1.37,"covid":false,"g":"Drama,Family,Fantasy","ir":6.6},{"zh":"荒野機器人","en":"The Wild Robot","rel":"2024-10-10","tw":53794767,"us":143901945,"exp":75731898,"r":0.71,"z":-0.39,"covid":false,"g":"Adventure,Animation,Family","ir":8.1},{"zh":"溫徹斯特鬼屋","en":"Winchester","rel":"2018-02-02","tw":26587981,"us":25091816,"exp":22833232,"r":1.164,"z":0.18,"covid":false,"g":"Biography,Horror,Mystery","ir":5.5},{"zh":"極地追擊","en":"Wind River","rel":"2017-09-29","tw":13203257,"us":33800859,"exp":28015195,"r":0.471,"z":-0.87,"covid":false,"g":"Crime,Drama,Mystery","ir":7.7},{"zh":"星願","en":"Wish","rel":"2023-12-26","tw":50904752,"us":63973821,"exp":43410732,"r":1.173,"z":0.18,"covid":false,"g":"Adventure,Animation,Comedy","ir":5.5},{"zh":"奇蹟男孩","en":"Wonder","rel":"2017-12-01","tw":58054585,"us":132422809,"exp":71531052,"r":0.812,"z":-0.24,"covid":false,"g":"Drama,Family","ir":7.9},{"zh":"奇幻遊樂園","en":"Wonder Park","rel":"2019-04-04","tw":11588692,"us":45216793,"exp":34209308,"r":0.339,"z":-1.25,"covid":false,"g":"Adventure,Animation,Comedy","ir":5.9},{"zh":"神力女超人","en":"Wonder Woman","rel":"2017-05-30","tw":333171557,"us":412563408,"exp":156058298,"r":2.135,"z":0.87,"covid":false,"g":"Action,Adventure,Fantasy","ir":7.3},{"zh":"神力女超人1984","en":"Wonder Woman 1984","rel":"2020-12-17","tw":249468117,"us":46801036,"exp":35027645,"r":7.122,"z":2.26,"covid":true,"g":"Action,Adventure,Fantasy","ir":5.3},{"zh":"旺卡","en":"Wonka","rel":"2023-12-05","tw":102428884,"us":218402312,"exp":100846490,"r":1.016,"z":0.02,"covid":false,"g":"Adventure,Comedy,Drama","ir":6.9},{"zh":"重裝制裁","en":"A Working Man","rel":"2025-03-28","tw":42296952,"us":37000711,"exp":29809851,"r":1.419,"z":0.4,"covid":false,"g":"Action,Thriller","ir":5.7},{"zh":"玩命鈔劫","en":"Wrath of Man","rel":"2021-04-29","tw":82242334,"us":27466489,"exp":24295497,"r":3.385,"z":1.41,"covid":true,"g":"Action,Crime,Thriller","ir":7.1},{"zh":"咆哮山莊","en":"Wuthering Heights","rel":"2026-02-13","tw":10517679,"us":84001072,"exp":52335280,"r":0.201,"z":-1.85,"covid":false,"g":"Drama,Romance","ir":6.1},{"zh":"X戰警：黑鳳凰","en":"X-Men: Dark Phoenix","rel":"2019-06-06","tw":105423917,"us":65845974,"exp":44278864,"r":2.381,"z":1.0,"covid":false,"g":"Action,Adventure,Sci-Fi","ir":5.7},{"zh":"限制級戰警：重返極限","en":"xXx: Return of Xander Cage","rel":"2017-01-20","tw":186094597,"us":44898413,"exp":34043772,"r":5.466,"z":1.96,"covid":false,"g":"Action,Adventure,Thriller","ir":5.2},{"zh":"靠譜歌王","en":"Yesterday","rel":"2019-06-28","tw":10597117,"us":73286650,"exp":47655645,"r":0.222,"z":-1.73,"covid":false,"g":"Comedy,Fantasy,Music","ir":6.8},{"zh":"屍樂園：髒比雙拼","en":"Zombieland: Double Tap","rel":"2019-10-09","tw":14334452,"us":73123082,"exp":47582605,"r":0.301,"z":-1.38,"covid":false,"g":"Action,Comedy,Horror","ir":6.6},{"zh":"動物方城市2","en":"Zootopia 2","rel":"2025-11-25","tw":756807158,"us":428130160,"exp":160076958,"r":4.728,"z":1.79,"covid":false,"g":"Adventure,Animation,Comedy","ir":7.3}],"fit":{"a":1.7818746404300074,"b":0.6864703086859663,"r2":0.384393779076326,"sd":0.8674917198106675,"n_fit":460,"fx":32},"weekly":{"us":[{"label":"Mar 1-7","amount":111027668,"theaters":4071},{"label":"Mar 8-14","amount":65190249,"theaters":4074},{"label":"Mar 15-21","amount":39540626,"theaters":3847},{"label":"Mar 22-28","amount":25531484,"theaters":3437},{"label":"Mar 29-Apr 4","amount":16368560,"theaters":3136},{"label":"Apr 5-11","amount":10125478,"theaters":2836},{"label":"Apr 12-18","amount":5908848,"theaters":2401},{"label":"Apr 19-25","amount":4065055,"theaters":2014},{"label":"Apr 26-May 2","amount":2800763,"theaters":1334},{"label":"May 3-9","amount":1044460,"theaters":702},{"label":"May 10-16","amount":541167,"theaters":416}],"tw_b":[{"label":"2/26–3/3","amount":79206927,"theaters":99},{"label":"3/4–3/10","amount":56626292,"theaters":99},{"label":"3/11–3/17","amount":39626447,"theaters":99},{"label":"3/18–3/24","amount":26129083,"theaters":99},{"label":"3/25–3/31","amount":12707713,"theaters":98},{"label":"4/1–4/7","amount":10082467,"theaters":93},{"label":"4/8–4/14","amount":4326360,"theaters":85},{"label":"4/15–4/21","amount":2207496,"theaters":65},{"label":"4/22–4/28","amount":1256238,"theaters":39},{"label":"4/29–5/5","amount":603841,"theaters":23},{"label":"5/6–5/12","amount":241403,"theaters":18},{"label":"5/13–5/19","amount":241516,"theaters":10},{"label":"5/20–5/26","amount":88038,"theaters":8},{"label":"5/27–6/2","amount":49095,"theaters":5},{"label":"6/3–6/9","amount":48075,"theaters":4},{"label":"6/10–6/16","amount":43555,"theaters":3},{"label":"6/17–6/23","amount":25035,"theaters":3},{"label":"6/24–6/30","amount":69230,"theaters":5},{"label":"7/1–7/7","amount":151295,"theaters":6},{"label":"7/8–7/14","amount":67910,"theaters":4},{"label":"7/15–7/21","amount":49700,"theaters":4},{"label":"7/22–7/28","amount":26170,"theaters":3},{"label":"7/29–8/4","amount":4140,"theaters":1}],"tw_c":[{"label":"2/28–3/5","amount":91175384,"theaters":99},{"label":"3/6–3/12","amount":53458948,"theaters":99},{"label":"3/13–3/19","amount":36480998,"theaters":99},{"label":"3/20–3/26","amount":24974682,"theaters":98},{"label":"3/27–4/2","amount":9718624,"theaters":95},{"label":"4/3–4/9","amount":9497965,"theaters":84},{"label":"4/10–4/16","amount":3950136,"theaters":64},{"label":"4/17–4/23","amount":2021552,"theaters":41},{"label":"4/24–4/30","amount":1054514,"theaters":24},{"label":"5/1–5/7","amount":510259,"theaters":18},{"label":"5/8–5/14","amount":209736,"theaters":11},{"label":"5/15–5/21","amount":248525,"theaters":8},{"label":"5/22–5/28","amount":51728,"theaters":4},{"label":"5/29–6/4","amount":52885,"theaters":3},{"label":"6/5–6/11","amount":51415,"theaters":3},{"label":"6/12–6/18","amount":34175,"theaters":3},{"label":"6/19–6/25","amount":23525,"theaters":2},{"label":"6/26–7/2","amount":84630,"theaters":5},{"label":"7/3–7/9","amount":148405,"theaters":5},{"label":"7/10–7/16","amount":63180,"theaters":4},{"label":"7/17–7/23","amount":46740,"theaters":3},{"label":"7/24–7/30","amount":17680,"theaters":2},{"label":"7/31–8/6","amount":2340,"theaters":1}],"tw_fri":[{"label":"3/1–3/7","amount":101989089,"theaters":99},{"label":"3/8–3/14","amount":50709474,"theaters":99},{"label":"3/15–3/21","amount":33840315,"theaters":99},{"label":"3/22–3/28","amount":21418770,"theaters":98},{"label":"3/29–4/4","amount":10426751,"theaters":95},{"label":"4/5–4/11","amount":7900072,"theaters":84},{"label":"4/12–4/18","amount":3563441,"theaters":64},{"label":"4/19–4/25","amount":1777117,"theaters":41},{"label":"4/26–5/2","amount":921494,"theaters":24},{"label":"5/3–5/9","amount":344724,"theaters":18},{"label":"5/10–5/16","amount":199966,"theaters":11},{"label":"5/17–5/23","amount":229493,"theaters":8},{"label":"5/24–5/30","amount":40905,"theaters":4},{"label":"5/31–6/6","amount":51575,"theaters":3},{"label":"6/7–6/13","amount":50525,"theaters":3},{"label":"6/14–6/20","amount":34940,"theaters":3},{"label":"6/21–6/27","amount":21895,"theaters":2},{"label":"6/28–7/4","amount":101630,"theaters":5},{"label":"7/5–7/11","amount":141300,"theaters":5},{"label":"7/12–7/18","amount":59610,"theaters":4},{"label":"7/19–7/25","amount":44600,"theaters":3},{"label":"7/26–8/1","amount":9620,"theaters":2},{"label":"8/2–8/8","amount":720,"theaters":1}],"ctd":[{"label":"Dec 8-14","amount":1066653,"theaters":16},{"label":"Dec 15-21","amount":1771403,"theaters":31},{"label":"Dec 22-28","amount":6085938,"theaters":143},{"label":"Dec 29-Jan 4, 2001","amount":6163717,"theaters":162},{"label":"Jan 5-11","amount":4906858,"theaters":172},{"label":"Jan 12-18","amount":11212601,"theaters":693},{"label":"Jan 19-25","amount":8158181,"theaters":837},{"label":"Jan 26-Feb 1","amount":6800996,"theaters":868},{"label":"Feb 2-8","amount":8764818,"theaters":1163},{"label":"Feb 9-15","amount":7809128,"theaters":1204},{"label":"Feb 16-22","amount":12607810,"theaters":1651},{"label":"Feb 23-Mar 1","amount":8401797,"theaters":1749},{"label":"Mar 2-8","amount":6506128,"theaters":1751},{"label":"Mar 9-15","amount":5976046,"theaters":1756},{"label":"Mar 16-22","amount":5408292,"theaters":1860},{"label":"Mar 23-29","amount":7068638,"theaters":2027},{"label":"Mar 30-Apr 5","amount":5995843,"theaters":1906},{"label":"Apr 6-12","amount":3918006,"theaters":1628},{"label":"Apr 13-19","amount":2704824,"theaters":1244},{"label":"Apr 20-26","amount":1804373,"theaters":1012},{"label":"Apr 27-May 3","amount":1013397,"theaters":683},{"label":"May 4-10","amount":833400,"theaters":563},{"label":"May 11-17","amount":697037,"theaters":539},{"label":"May 25-31","amount":1217464,"theaters":312},{"label":"Jun 1-7","amount":394182,"theaters":276},{"label":"Jun 8-14","amount":262084,"theaters":229},{"label":"Jun 15-21","amount":182919,"theaters":171},{"label":"Jun 22-28","amount":128406,"theaters":122}]}};
+const F = DATA.films, FIT = DATA.fit;
+const SD = FIT.sd, HI_T = Math.exp(SD), LO_T = Math.exp(-SD);
+const dune = F.find(f => f.zh === "沙丘：第二部");
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const yi = n => (n / 1e8).toFixed(2) + " 億";
+const usM = n => "US$" + (n / 1e6).toLocaleString("en-US", { maximumFractionDigits: n < 1e7 ? 1 : 0 }) + "M";
+const xr = r => "×" + (r >= 10 ? r.toFixed(1) : r.toFixed(2));
+const cls = f => f.r > HI_T ? "hi" : f.r < LO_T ? "lo" : "mid";
+const verdict = f => f.r > Math.exp(2 * SD) ? "台灣極端偏強（超過 2 個標準差）" : f.r > HI_T ? "台灣明顯偏強" : f.r < Math.exp(-2 * SD) ? "台灣極端偏弱" : f.r < LO_T ? "台灣明顯偏弱" : "正常範圍內";
+
+document.getElementById("k-n").textContent = F.length;
+document.getElementById("k-dune").textContent = xr(dune.r);
+document.getElementById("k-r2").textContent = FIT.r2.toFixed(2);
+document.getElementById("m-eq").textContent = `ln(台灣票房) = ${FIT.a.toFixed(3)} + ${FIT.b.toFixed(3)} × ln(美國票房)`;
+document.getElementById("m-sd").textContent = `${SD.toFixed(3)}（×${HI_T.toFixed(2)}）`;
+
+// ---------- controls ----------
+const years = [...new Set(F.map(f => +f.rel.slice(0, 4)))].sort();
+for (const id of ["y0", "y1"]) {
+  const s = document.getElementById(id);
+  years.forEach(y => s.add(new Option(y, y)));
+}
+const y0 = document.getElementById("y0"), y1 = document.getElementById("y1"), cv = document.getElementById("cv"), q = document.getElementById("q");
+y0.value = years[0]; y1.value = years[years.length - 1];
+const dl = document.getElementById("names");
+F.forEach(f => { dl.append(new Option(f.zh)); });
+const PRESETS = ["沙丘：第二部", "氣象戰", "惡靈古堡：最終章", "水行俠失落王國", "哥吉拉與金剛:新帝國", "不可能的任務：最終清算", "F1電影", "魔法壞女巫"];
+const key = s => s.replace(/\s/g, "");
+const byKey = new Map(F.map(f => [key(f.zh), f]));
+const presetBox = document.getElementById("presets");
+PRESETS.forEach(n => {
+  const f = byKey.get(key(n)); if (!f) return;
+  const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = f.zh;
+  b.addEventListener("click", () => select(f)); presetBox.append(b);
+});
+let selected = byKey.get(key("氣象戰")) || dune;
+if (byKey.get(key("氣象戰"))) document.getElementById("k-top").textContent = xr(byKey.get(key("氣象戰")).r);
+const visible = () => F.filter(f => { const y = +f.rel.slice(0, 4); return y >= +y0.value && y <= +y1.value && (cv.checked || !f.covid); });
+
+// ---------- scatter ----------
+const sc = document.getElementById("scatter");
+const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; sc.append(tip);
+function tipHtml(f) {
+  return `<b>${f.zh}</b><br><span class="muted">${f.en} · ${f.rel}</span>
+  <div class="row"><span>台灣票房</span><span class="num">NT$${yi(f.tw)}</span></div>
+  <div class="row"><span>美國本土</span><span class="num">${usM(f.us)}</span></div>
+  <div class="row"><span>台灣預期</span><span class="num">NT$${yi(f.exp)}</span></div>
+  <div class="row"><span>實際 ÷ 預期</span><span class="num"><b>${xr(f.r)}</b></span></div>
+  ${f.g ? `<div class="muted" style="margin-top:2px">${f.g.replace(/,/g, " · ")}${f.ir ? ` ｜ IMDb ${f.ir.toFixed(1)}` : ""}</div>` : ""}`;
+}
+function placeTip(box, px, py, w) {
+  tip.hidden = false;
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let x = px + 14, y = py - th - 10;
+  if (x + tw > w) x = px - tw - 14;
+  if (y < 0) y = py + 14;
+  tip.style.left = Math.max(0, x) + "px"; tip.style.top = y + "px";
+}
+function drawScatter() {
+  sc.querySelectorAll("svg").forEach(s => s.remove());
+  const W = Math.max(320, sc.clientWidth), H = Math.round(Math.min(620, Math.max(380, W * 0.68)));
+  const m = { t: 12, r: 14, b: 44, l: 54 };
+  const x = d3.scaleLog().domain([1e6, 1.3e9]).range([m.l, W - m.r]);
+  const y = d3.scaleLog().domain([8e6, 1.5e9]).range([H - m.b, m.t]);
+  const svg = d3.select(sc).insert("svg", ".tip").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img")
+    .attr("aria-label", "台灣票房對美國本土票房的散佈圖");
+  const xt = [1e6, 3e6, 1e7, 3e7, 1e8, 3e8, 1e9], ytk = [1e7, 3e7, 1e8, 3e8, 1e9];
+  svg.append("g").selectAll("line").data(xt).join("line").attr("class", "gridline").attr("x1", x).attr("x2", x).attr("y1", m.t).attr("y2", H - m.b);
+  svg.append("g").selectAll("line").data(ytk).join("line").attr("class", "gridline").attr("y1", y).attr("y2", y).attr("x1", m.l).attr("x2", W - m.r);
+  svg.append("g").selectAll("text").data(xt).join("text").attr("x", x).attr("y", H - m.b + 18).attr("text-anchor", "middle").text(d => (d / 1e6).toLocaleString("en-US"));
+  svg.append("g").selectAll("text").data(ytk).join("text").attr("x", m.l - 8).attr("y", d => y(d) + 4).attr("text-anchor", "end").text(d => (d / 1e6).toLocaleString("en-US"));
+  svg.append("text").attr("x", (m.l + W - m.r) / 2).attr("y", H - 6).attr("text-anchor", "middle").text("美國本土總票房（百萬美元，對數尺度）");
+  svg.append("text").attr("transform", `translate(14,${(m.t + H - m.b) / 2}) rotate(-90)`).attr("text-anchor", "middle").text("台灣總票房（百萬新台幣，對數尺度）");
+  // band + line (expected TWD = exp(a + b ln US) * fx)
+  const xs = d3.range(0, 51).map(i => Math.exp(Math.log(1.2e6) + i / 50 * (Math.log(1.25e9) - Math.log(1.2e6))));
+  const ex = u => Math.exp(FIT.a + FIT.b * Math.log(u)) * FIT.fx;
+  const clampY = v => Math.min(Math.max(v, 8e6), 1.5e9);
+  svg.append("path").attr("fill", css("--hi-soft")).attr("d", d3.area().x(u => x(u)).y0(u => y(clampY(ex(u) / HI_T))).y1(u => y(clampY(ex(u) * HI_T)))(xs));
+  svg.append("path").attr("fill", "none").attr("stroke", css("--hi")).attr("stroke-width", 2).attr("d", d3.line().x(u => x(u)).y(u => y(clampY(ex(u))))(xs));
+  const vis = visible();
+  const col = f => f === dune ? css("--dune") : f.r > HI_T ? css("--hi") : f.r < LO_T ? css("--lo") : css("--point");
+  const g = svg.append("g");
+  g.selectAll("circle").data(vis.filter(f => f !== dune)).join("circle")
+    .attr("cx", f => x(f.us)).attr("cy", f => y(f.tw)).attr("r", 4)
+    .attr("fill", f => f.covid ? css("--surface") : col(f))
+    .attr("stroke", f => f.covid ? col(f) : css("--surface")).attr("stroke-width", f => f.covid ? 1.4 : 1);
+  if (vis.includes(dune)) {
+    svg.append("path").attr("d", d3.symbol(d3.symbolStar, 170)()).attr("transform", `translate(${x(dune.us)},${y(dune.tw)})`)
+      .attr("fill", css("--dune")).attr("stroke", css("--surface")).attr("stroke-width", 1.2);
+  }
+  if (selected && vis.includes(selected)) {
+    const sx = x(selected.us), sy = y(selected.tw);
+    svg.append("circle").attr("cx", sx).attr("cy", sy).attr("r", 10).attr("fill", "none").attr("stroke", css("--ink")).attr("stroke-width", 2);
+    const right = sx < W - 190;
+    svg.append("text").attr("x", right ? sx + 15 : sx - 15).attr("y", sy + 4).attr("text-anchor", right ? "start" : "end")
+      .style("fill", css("--ink")).style("font-weight", 700).style("font-size", "12.5px").style("paint-order", "stroke")
+      .style("stroke", css("--surface")).style("stroke-width", "4px").text(`${selected.zh}  ${xr(selected.r)}`);
+  }
+  // hover via nearest point
+  const pts = vis.map(f => [x(f.us), y(f.tw)]);
+  const del = d3.Delaunay.from(pts);
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .style("cursor", "pointer")
+    .on("mousemove", ev => {
+      const [px, py] = d3.pointer(ev); const i = del.find(px, py);
+      if (i < 0 || Math.hypot(pts[i][0] - px, pts[i][1] - py) > 22) { tip.hidden = true; return; }
+      tip.innerHTML = tipHtml(vis[i]);
+      const k = sc.clientWidth / W; placeTip(sc, pts[i][0] * k, pts[i][1] * k, sc.clientWidth);
+    })
+    .on("mouseleave", () => { tip.hidden = true; })
+    .on("click", ev => {
+      const [px, py] = d3.pointer(ev); const i = del.find(px, py);
+      if (i >= 0 && Math.hypot(pts[i][0] - px, pts[i][1] - py) <= 22) select(vis[i]);
+    });
+}
+function drawDetail() {
+  const f = selected, el = document.getElementById("detail");
+  if (!f) { el.innerHTML = `<p class="muted">點散佈圖上的點，或用上方搜尋找一部片。</p>`; return; }
+  const c = cls(f);
+  // position on a log scale from ×0.05 to ×40
+  const pos = v => Math.min(100, Math.max(0, (Math.log(v) - Math.log(0.05)) / (Math.log(40) - Math.log(0.05)) * 100));
+  const rel = f === dune ? "" : `<p class="note">相當於《沙丘2》的 ${(f.r / dune.r).toFixed(2)} 倍。</p>`;
+  el.innerHTML = `
+    <div><div class="eyebrow">${f.rel.slice(0, 4)} · 台灣 ${f.rel.slice(5).replace("-", "/")} 上映</div>
+    <h3 style="font-size:19px">${f.zh}</h3><span class="en">${f.en}</span></div>
+    <div><div class="ratio">${xr(f.r)}</div><div class="muted" style="font-size:12.5px">台灣實際 ÷ 預期</div></div>
+    <span class="pill ${c}">${verdict(f)}${f.covid ? "・疫情期" : ""}</span>
+    <div><div class="scale" aria-hidden="true"><div class="track"></div>
+      <div class="band" style="left:${pos(LO_T)}%;width:${pos(HI_T) - pos(LO_T)}%"></div>
+      <div class="dmark" style="left:${pos(dune.r)}%" title="沙丘2"></div>
+      <div class="mark" style="left:${pos(f.r)}%"></div></div>
+      <div class="scale-labels"><span>×0.05</span><span>×1</span><span>×40</span></div></div>
+    <dl>
+      <dt>台灣票房</dt><dd>NT$${yi(f.tw)}</dd>
+      <dt>台灣預期</dt><dd>NT$${yi(f.exp)}</dd>
+      <dt>美國本土</dt><dd>${usM(f.us)}</dd>
+      <dt>排名</dt><dd>${[...F].sort((a, b) => b.r - a.r).indexOf(f) + 1} / ${F.length}</dd>
+      ${f.g ? `<dt>IMDb 類型</dt><dd style="font-family:var(--f-body)">${f.g.replace(/,/g, "、")}</dd>` : ""}
+      ${f.ir ? `<dt>IMDb 評分</dt><dd>${f.ir.toFixed(1)}</dd>` : ""}
+    </dl>${rel}`;
+}
+function select(f) {
+  selected = f; q.value = "";
+  const y = +f.rel.slice(0, 4);
+  if (y < +y0.value) y0.value = y; if (y > +y1.value) y1.value = y;
+  if (f.covid && !cv.checked) cv.checked = true;
+  drawScatter(); drawDetail();
+}
+q.addEventListener("change", () => {
+  const t = key(q.value).toLowerCase(); if (!t) return;
+  const f = byKey.get(key(q.value)) || F.find(f => key(f.zh).toLowerCase().includes(t) || f.en.toLowerCase().replace(/\s/g, "").includes(t));
+  if (f) select(f);
+});
+[y0, y1, cv].forEach(e => e.addEventListener("change", () => { if (+y0.value > +y1.value) [y0.value, y1.value] = [y1.value, y0.value]; drawScatter(); }));
+
+// ---------- ranking ----------
+let mode = "hi", sortK = null, sortDir = -1;
+const tbody = document.querySelector("#rtable tbody"), tq = document.getElementById("tq");
+const rankOf = new Map([...F].sort((a, b) => b.r - a.r).map((f, i) => [f, i + 1]));
+function drawTable() {
+  let rows = mode === "hi" ? [...F].sort((a, b) => b.r - a.r) : mode === "lo" ? [...F].sort((a, b) => a.r - b.r) : F.filter(f => f.tw >= 1e8).sort((a, b) => b.r - a.r);
+  const t = tq.value.trim().toLowerCase().replace(/\s/g, "");
+  if (t) rows = rows.filter(f => key(f.zh).toLowerCase().includes(t) || f.en.toLowerCase().replace(/\s/g, "").includes(t));
+  if (sortK) rows.sort((a, b) => { const va = sortK === "rank" ? rankOf.get(a) : a[sortK], vb = sortK === "rank" ? rankOf.get(b) : b[sortK]; return (va > vb ? 1 : va < vb ? -1 : 0) * sortDir; });
+  const shown = t || mode === "big" ? rows : rows.slice(0, 25);
+  document.getElementById("tcount").textContent = `顯示 ${shown.length} / ${rows.length} 部`;
+  const lr = v => Math.log(v) / Math.log(40); // −1..1 maps to ×1/40..×40
+  tbody.innerHTML = shown.map(f => {
+    const p = Math.max(-1, Math.min(1, lr(f.r))) * 50;
+    const color = f === dune ? "var(--dune)" : f.r >= 1 ? "var(--hi)" : "var(--lo)";
+    const bar = p >= 0 ? `left:50%;width:${p}%` : `left:${50 + p}%;width:${-p}%`;
+    return `<tr data-k="${key(f.zh)}" class="${f === dune ? "is-dune" : ""}">
+      <td class="r num">${rankOf.get(f)}</td>
+      <td>${f.zh}<span class="en">${f.en}</span></td>
+      <td class="num">${f.rel}</td>
+      <td class="r num">${yi(f.tw)}</td>
+      <td class="r num">${usM(f.us)}</td>
+      <td class="r"><div class="rbar"><span class="num">${xr(f.r)}</span><span class="b"><span style="${bar};background:${color}"></span></span></div></td></tr>`;
+  }).join("");
+}
+tbody.addEventListener("click", e => {
+  const tr = e.target.closest("tr"); if (!tr) return;
+  const f = byKey.get(tr.dataset.k); if (!f) return;
+  select(f); document.getElementById("explore").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+});
+document.querySelectorAll("#rank .seg button").forEach(b => b.addEventListener("click", () => {
+  mode = b.dataset.mode; sortK = null;
+  document.querySelectorAll("#rank .seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  document.querySelectorAll("#rtable th").forEach(th => th.removeAttribute("aria-sort"));
+  drawTable();
+}));
+document.querySelectorAll("#rtable th").forEach(th => th.addEventListener("click", () => {
+  const k = th.dataset.k; sortDir = sortK === k ? -sortDir : (k === "zh" || k === "rel" || k === "rank" ? 1 : -1); sortK = k;
+  document.querySelectorAll("#rtable th").forEach(x => x.removeAttribute("aria-sort"));
+  th.setAttribute("aria-sort", sortDir > 0 ? "ascending" : "descending"); drawTable();
+}));
+tq.addEventListener("input", drawTable);
+
+// ---------- weekly charts ----------
+const WK = DATA.weekly;
+const WDEF = {
+  us: { t: "美國：Box Office Mojo 週票房（週五至週四）", cur: "US$", scale: 1e6, unit: "百萬美元", total: 282144358 },
+  tw_b: { t: "台灣：官方週（週一至週日），第一週只有 5 天正式上映", cur: "NT$", scale: 1e6, unit: "百萬新台幣", total: 234186196 },
+  tw_c: { t: "台灣：從上映日 2/28（週三）起算每 7 天，預映併入第一週", cur: "NT$", scale: 1e6, unit: "百萬新台幣", total: 234186196 },
+  tw_fri: { t: "台灣：硬套週五至週四，第一週含 2/27–2/29 共 9 天", cur: "NT$", scale: 1e6, unit: "百萬新台幣", total: 234186196 },
+};
+function weekChart(el, rows, o) {
+  el.querySelectorAll("svg,.tip").forEach(s => s.remove());
+  const tp = document.createElement("div"); tp.className = "tip"; tp.hidden = true; el.append(tp);
+  const W = Math.max(320, el.clientWidth), H = o.h || 380;
+  const m = { t: 16, r: 12, b: 56, l: 52 }, gap = 26, top = (H - m.t - m.b - gap) * 0.6;
+  const x = d3.scaleBand().domain(rows.map((_, i) => i)).range([m.l, W - m.r]).padding(0.22);
+  const ya = d3.scaleLinear().domain([0, d3.max(rows, r => r.amount) / o.scale * (o.ann ? 1.32 : 1.08)]).nice().range([m.t + top, m.t]);
+  const t0 = m.t + top + gap, t1 = H - m.b;
+  const yt = d3.scaleLinear().domain([0, d3.max(rows, r => r.theaters) * 1.15]).nice().range([t1, t0]);
+  const svg = d3.select(el).insert("svg", ".tip").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", o.label || "每週票房與戲院數");
+  const grid = (sc, y0, y1, n) => { svg.append("g").selectAll("line").data(sc.ticks(n)).join("line").attr("class", "gridline").attr("x1", m.l).attr("x2", W - m.r).attr("y1", sc).attr("y2", sc);
+    svg.append("g").selectAll("text").data(sc.ticks(n)).join("text").attr("x", m.l - 8).attr("y", d => sc(d) + 4).attr("text-anchor", "end").text(d => d.toLocaleString("en-US")); };
+  grid(ya, 0, 0, 4); grid(yt, 0, 0, 3);
+  svg.append("text").attr("x", m.l - 44).attr("y", m.t - 4).text(o.unit);
+  svg.append("text").attr("x", m.l - 44).attr("y", t0 - 6).text("戲院數");
+  svg.append("g").selectAll("rect").data(rows).join("rect").attr("x", (_, i) => x(i)).attr("width", x.bandwidth())
+    .attr("y", r => ya(r.amount / o.scale)).attr("height", r => ya(0) - ya(r.amount / o.scale)).attr("rx", Math.min(3, x.bandwidth() / 3)).attr("fill", css("--bar"));
+  const ln = d3.line().x((_, i) => x(i) + x.bandwidth() / 2).y(r => yt(r.theaters));
+  svg.append("path").attr("d", ln(rows)).attr("fill", "none").attr("stroke", css("--theater")).attr("stroke-width", 2);
+  svg.append("g").selectAll("circle").data(rows).join("circle").attr("cx", (_, i) => x(i) + x.bandwidth() / 2).attr("cy", r => yt(r.theaters)).attr("r", 3.2).attr("fill", css("--theater"));
+  rows.slice(0, 2).forEach((r, i) => svg.append("text").attr("x", x(i) + x.bandwidth() / 2).attr("y", ya(r.amount / o.scale) - 5).attr("text-anchor", "middle")
+    .style("fill", css("--ink")).style("font-size", "11px").text((r.amount / o.scale).toFixed(1)));
+  const every = Math.ceil(rows.length / Math.max(4, Math.floor((W - m.l) / 46)));
+  svg.append("g").selectAll("text").data(rows).join("text").attr("x", (_, i) => x(i) + x.bandwidth() / 2).attr("y", H - m.b + 16)
+    .attr("text-anchor", "middle").text((r, i) => i % every === 0 ? `W${i + 1}` : "");
+  svg.append("g").selectAll("text").data(rows).join("text").attr("x", (_, i) => x(i) + x.bandwidth() / 2).attr("y", H - m.b + 30)
+    .attr("text-anchor", "middle").style("font-size", "10px").text((r, i) => i % every === 0 ? r.label.replace(", 2001", "") : "");
+  if (o.ann) o.ann.forEach(([i, txt]) => {
+    const cx = x(i) + x.bandwidth() / 2, cy = ya(rows[i].amount / o.scale);
+    svg.append("line").attr("x1", cx).attr("x2", cx).attr("y1", cy - 4).attr("y2", cy - 14).attr("stroke", css("--muted"));
+    txt.split("\n").forEach((s, k, arr) => svg.append("text").attr("x", cx).attr("y", cy - 18 - (arr.length - 1 - k) * 13).attr("text-anchor", "middle")
+      .style("fill", css("--ink")).style("font-size", "11px").text(s));
+  });
+  const hl = svg.append("rect").attr("y", m.t).attr("height", H - m.t - m.b).attr("width", x.step()).attr("fill", css("--hi-soft")).attr("opacity", 0);
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("mousemove", ev => {
+      const [px] = d3.pointer(ev); const i = Math.max(0, Math.min(rows.length - 1, Math.floor((px - m.l) / x.step())));
+      const r = rows[i], p = rows[i - 1];
+      hl.attr("x", x(i) - (x.step() - x.bandwidth()) / 2).attr("opacity", 1);
+      const ch = p ? ((r.amount / p.amount - 1) * 100).toFixed(1) + "%" : "—";
+      tp.innerHTML = `<b>第 ${i + 1} 週</b> <span class="muted">${r.label}</span>
+        <div class="row"><span>週票房</span><span class="num">${o.cur}${(r.amount / 1e6).toFixed(2)}M</span></div>
+        <div class="row"><span>較上週</span><span class="num">${ch}</span></div>
+        <div class="row"><span>戲院數</span><span class="num">${r.theaters.toLocaleString("en-US")}</span></div>`;
+      const k = el.clientWidth / W; tp.hidden = false;
+      let lx = (x(i) + x.bandwidth()) * k + 10; if (lx + tp.offsetWidth > el.clientWidth) lx = x(i) * k - tp.offsetWidth - 10;
+      tp.style.left = Math.max(0, lx) + "px"; tp.style.top = (m.t * k) + "px";
+    })
+    .on("mouseleave", () => { tp.hidden = true; hl.attr("opacity", 0); });
+}
+let wsel = "tw_b";
+function drawWeeks() {
+  const o = WDEF[wsel];
+  document.getElementById("wtitle").textContent = o.t;
+  weekChart(document.getElementById("wchart"), WK[wsel], { ...o, label: o.t });
+  const cmp = document.querySelector("#cmp tbody");
+  const names = { us: "美國", tw_b: "台灣官方", tw_c: "台灣重整", tw_fri: "台灣週五起" };
+  cmp.innerHTML = Object.keys(WDEF).map(k => {
+    const r = WK[k], d = WDEF[k];
+    return `<tr class="${k === wsel ? "on" : ""}"><td>${names[k]}</td>
+      <td class="r num">${d.cur === "US$" ? "$" + (r[0].amount / 1e6).toFixed(1) + "M" : (r[0].amount / 1e6).toFixed(1) + "M"}</td>
+      <td class="r num">${((r[1].amount / r[0].amount - 1) * 100).toFixed(1)}%</td>
+      <td class="r num">${(r[0].amount / d.total * 100).toFixed(1)}%</td></tr>`;
+  }).join("");
+}
+document.querySelectorAll("#wseg button").forEach(b => b.addEventListener("click", () => {
+  wsel = b.dataset.w; document.querySelectorAll("#wseg button").forEach(x => x.setAttribute("aria-pressed", x === b)); drawWeeks();
+}));
+function drawCtd() {
+  const narrow = document.getElementById("cchart").clientWidth < 620;
+  const ann = narrow ? [[5, "金球獎"], [10, "奧斯卡提名"], [15, "頒獎"]] :
+    [[2, "聖誕檔擴映"], [5, "金球獎前後\n擴至 693 家"], [10, "奧斯卡 10 項提名\n＋總統日"], [15, "奧斯卡頒獎\n獲 4 座"]];
+  weekChart(document.getElementById("cchart"), WK.ctd, { cur: "US$", scale: 1e6, unit: "百萬美元", h: 400, ann, label: "臥虎藏龍每週票房與戲院數" });
+}
+
+// ---------- why section ----------
+function drawWhy() {
+  const A = DATA.analysis; if (!A) return;
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // diverging bar on a log scale: ×1/span .. ×span, centered at ×1
+  const div = (x, span = 3) => {
+    const p = Math.max(-1, Math.min(1, Math.log(x) / Math.log(span))) * 50;
+    const col = x >= 1 ? "var(--hi)" : "var(--lo)";
+    return `<div class="track div"><span style="${p >= 0 ? `left:50%;width:${p}%` : `left:${50 + p}%;width:${-p}%`};background:${col}"></span></div>`;
+  };
+  const bar = (v, max, col = "var(--hi)") => `<div class="track"><span style="left:0;width:${Math.max(0, v) / max * 100}%;background:${col}"></span></div>`;
+  const g = A.groups;
+  $("why-intro").textContent = `把非疫情期的 ${A.n_model} 部片分成三組：比預期高出 1 個標準差以上的「偏強組」${g["上方"]} 部、落在正常範圍的 ${g["帶內"]} 部、低於 1 個標準差的「偏弱組」${g["下方"]} 部，再用 IMDb、Wikidata 與 Box Office Mojo 的資料比較三組的差異。`;
+  $("w-ladder").innerHTML = A.ladder.map(d => `<div class="hb"><span class="lab">${d.step}</span>${bar(d.r2, 1, "var(--ink)")}<span class="v">${d.r2.toFixed(2)}</span></div>`).join("");
+  $("w-genre").innerHTML = A.genre.filter(d => d.n >= 20).map(d => `<div class="hb"><span class="lab">${d.zh}<small>${d.n}</small></span>${div(d.x, 2.5)}<span class="v">×${d.x.toFixed(2)}</span></div>`).join("");
+  $("w-market").innerHTML = A.markets.map(d => `<div class="hb"><span class="lab">${d.zh}<small>${d.n}</small></span>${bar(d.r, 1)}<span class="v">${d.r.toFixed(2)}</span></div>`).join("");
+  $("w-fs-hi").textContent = Math.round(A.foreign_share["上方"] * 100) + "%";
+  $("w-fs-lo").textContent = Math.round(A.foreign_share["下方"] * 100) + "%";
+  const li = d => `<li>${esc(d.name)}<span>×${d.x.toFixed(2)}・${d.n} 部</span><small>${esc(d.films)}</small></li>`;
+  $("w-act-hi").innerHTML = A.actors_hi.slice(0, 5).map(li).join("");
+  $("w-act-lo").innerHTML = A.actors_lo.slice(0, 5).map(li).join("");
+  $("w-dir-hi").innerHTML = A.directors_hi.slice(0, 4).map(li).join("");
+  $("w-dir-lo").innerHTML = A.directors_lo.slice(0, 4).map(li).join("");
+  $("w-star-note").textContent = `只列主演（演員表前 4 名）至少 4 部的演員。用「這位演員其他片的表現」預測這部片，控制類型後仍顯著（t = ${A.star.t}），但演員效應和系列片效應分不開。`;
+  $("w-gap").innerHTML = A.gap.map(d => `<div class="hb"><span class="lab">${d.zh}<small>${d.n}</small></span>${div(d.x, 2.5)}<span class="v">×${d.x.toFixed(2)}</span></div>`).join("");
+  const B = A.budget;
+  $("w-budget").innerHTML = `在美國票房相同的情況下，預算每加倍，台灣票房約多 <b>${Math.round((Math.pow(2, B.coef) - 1) * 100)}%</b>。美國票房低於製作預算的「美國賠錢片」，台灣中位數是 <b>×${B.flop_x.toFixed(2)}</b>；美國有回本的是 ×${B.ok_x.toFixed(2)}。（有預算資料的 ${B.n} 部）`;
+  const R = A.rating;
+  $("w-rating").innerHTML = `三組的 IMDb 評分中位數都是 ${R.by_group["上方"].toFixed(1)}。控制其他因素後，評分每高 1 分，台灣相對多 <b>${Math.round((R.coef_x - 1) * 100)}%</b>（t = ${R.t}）。台灣觀眾對品質的反應至少和美國一樣，「爛片在台灣比較不受影響」的推測不成立。`;
+  $("w-year").innerHTML = A.year.filter(d => d.n >= 15).map(d => `<div class="hb"><span class="lab">${d.y}<small>${d.n}</small></span>${div(d.x, 2.5)}<span class="v">×${d.x.toFixed(2)}</span></div>`).join("");
+}
+
+// ---------- Netflix section ----------
+let nfKey = "comp_tv";
+const ORIG = [["台灣", "o1"], ["韓國", "o2"], ["日本", "o3"], ["中國／香港", "o4"], ["美國", "o5"], ["其他英語系", "o6"], ["其他", "o7"]];
+function drawNetflix() {
+  const N = DATA.netflix; if (!N) return;
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const bar = (v, max, col) => `<div class="track"><span style="left:0;width:${Math.max(0, v) / max * 100}%;background:${col}"></span></div>`;
+  $("nf-intro").textContent = `Netflix 官方公布 ${N.n_countries} 個國家、${N.from} 到 ${N.to} 共 ${N.weeks} 週的前十名（電影、影集分開）。台灣榜上出現過 ${N.tw_titles.toLocaleString()} 部作品，其中 ${N.local_share_titles}% 從未登上全球前十名。`;
+  const tw = N.overlap.find(d => d.c === "台灣");
+  $("nf-rank").textContent = tw.rank;
+  const pick = N.overlap.slice(0, 9).concat(N.overlap.filter(d => ["英國", "美國"].includes(d.c))).concat(N.overlap.slice(-1));
+  $("nf-overlap").innerHTML = pick.map(d => `<div class="hb ${d.c === "台灣" ? "me" : ""}"><span class="lab">${d.c}<small>#${d.rank}</small></span>${bar(d.v, 100, d.c === "台灣" ? "var(--dune)" : "var(--hi)")}<span class="v">${d.v.toFixed(0)}%</span></div>`).join("");
+  $("nf-sim").innerHTML = N.similar.map((d, i) => `${i === 8 ? '<div class="note" style="margin:2px 0">⋯ 最不像的國家</div>' : ""}<div class="hb"><span class="lab">${d.c}</span>${bar(d.v, 0.6, i < 8 ? "var(--hi)" : "var(--lo)")}<span class="v">${d.v.toFixed(2)}</span></div>`).join("");
+  $("nf-comp").innerHTML = N[nfKey].map(r => `<div class="srow ${r.c === "台灣" ? "me" : ""}"><span class="lab">${r.c}</span><div class="sbar" role="img" aria-label="${r.c} 內容來源">${ORIG.map(([o, k]) => {
+    const v = r.parts[o] || 0; return v > 0 ? `<span class="${k}" style="flex:${v} 1 0;background:var(--${k})" title="${o} ${v.toFixed(1)}%">${v >= 7 ? v.toFixed(0) + "%" : ""}</span>` : ""; }).join("")}</div></div>`).join("");
+  $("nf-legend").innerHTML = ORIG.map(([o, k]) => `<span><i class="sq" style="background:var(--${k})"></i>${o}</span>`).join("");
+  // TV trend lines
+  const el = $("nf-trend"); el.querySelectorAll("svg").forEach(x => x.remove());
+  const T = N.trend_tv, years = Object.keys(T["韓國"]), W = Math.max(300, el.clientWidth), H = 220, m = { t: 12, r: 44, b: 26, l: 34 };
+  const x = d3.scalePoint().domain(years).range([m.l, W - m.r]), y = d3.scaleLinear().domain([0, 60]).range([H - m.b, m.t]);
+  const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "img").attr("aria-label", "台灣影集前十名來源比例逐年變化");
+  svg.append("g").selectAll("line").data([0, 20, 40, 60]).join("line").attr("class", "gridline").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  svg.append("g").selectAll("text").data([0, 20, 40, 60]).join("text").attr("x", m.l - 6).attr("y", d => y(d) + 4).attr("text-anchor", "end").text(d => d + "%");
+  svg.append("g").selectAll("text").data(years).join("text").attr("x", x).attr("y", H - 6).attr("text-anchor", "middle").text(d => d);
+  const lines = [["韓國", "o2"], ["日本", "o3"], ["中國／香港", "o4"], ["台灣", "o1"]];
+  lines.forEach(([o, k]) => {
+    const pts = years.map(yr => [x(yr), y(T[o][yr])]);
+    svg.append("path").attr("d", d3.line()(pts)).attr("fill", "none").attr("stroke", css("--" + k)).attr("stroke-width", 2);
+    svg.append("g").selectAll("circle").data(pts).join("circle").attr("cx", d => d[0]).attr("cy", d => d[1]).attr("r", 3).attr("fill", css("--" + k));
+    const last = pts[pts.length - 1];
+    svg.append("text").attr("x", last[0] + 6).attr("y", last[1] + 4).style("fill", css("--ink")).style("font-size", "11px").text(`${T[o][years[years.length - 1]].toFixed(0)}%`);
+  });
+  $("nf-trend-legend").innerHTML = lines.map(([o, k]) => `<span><i class="ln" style="background:var(--${k})"></i>${o}</span>`).join("");
+  // theatrical -> Netflix scatter
+  const th = N.theatrical, el2 = $("nf-theat"); el2.querySelectorAll("svg").forEach(x => x.remove());
+  const W2 = Math.max(300, el2.clientWidth), H2 = 240, m2 = { t: 12, r: 12, b: 38, l: 40 };
+  const xs = d3.scaleLog().domain([0.2, 6]).range([m2.l, W2 - m2.r]), ys = d3.scaleLinear().domain([-14, 8]).range([H2 - m2.b, m2.t]);
+  const s2 = d3.select(el2).append("svg").attr("viewBox", `0 0 ${W2} ${H2}`).attr("role", "img").attr("aria-label", "院線表現與 Netflix 上榜週數差");
+  s2.append("g").selectAll("line").data([-12, -8, -4, 0, 4, 8]).join("line").attr("class", "gridline").attr("x1", m2.l).attr("x2", W2 - m2.r).attr("y1", ys).attr("y2", ys);
+  s2.append("line").attr("x1", xs(1)).attr("x2", xs(1)).attr("y1", m2.t).attr("y2", H2 - m2.b).attr("stroke", css("--muted")).attr("stroke-dasharray", "3 3");
+  s2.append("g").selectAll("text").data([-12, -8, -4, 0, 4, 8]).join("text").attr("x", m2.l - 6).attr("y", d => ys(d) + 4).attr("text-anchor", "end").text(d => (d > 0 ? "+" : "") + d);
+  s2.append("g").selectAll("text").data([0.25, 0.5, 1, 2, 4]).join("text").attr("x", xs).attr("y", H2 - m2.b + 16).attr("text-anchor", "middle").text(d => "×" + d);
+  s2.append("text").attr("x", (m2.l + W2 - m2.r) / 2).attr("y", H2 - 4).attr("text-anchor", "middle").text("院線：台灣實際 ÷ 預期");
+  s2.append("text").attr("transform", `translate(11,${(m2.t + H2 - m2.b) / 2}) rotate(-90)`).attr("text-anchor", "middle").text("台灣榜週數 − 全球榜週數");
+  const tp = el2.querySelector(".tip") || Object.assign(document.createElement("div"), { className: "tip", hidden: true }); el2.append(tp);
+  s2.append("g").selectAll("circle").data(th.pts).join("circle").attr("cx", d => xs(Math.min(6, Math.max(0.2, d.x)))).attr("cy", d => ys(Math.max(-14, Math.min(8, d.d)))).attr("r", 4.5)
+    .attr("fill", d => d.x > 2.38 ? css("--hi") : d.x < 0.42 ? css("--lo") : css("--point")).attr("stroke", css("--surface")).style("cursor", "pointer")
+    .on("mouseenter", (ev, d) => { tp.innerHTML = `<b>${esc(d.t)}</b><div class="row"><span>院線實際÷預期</span><span class="num">×${d.x}</span></div><div class="row"><span>台灣榜／全球榜</span><span class="num">${d.tw} 週／${d.g} 週</span></div>`;
+      tp.hidden = false; const k = el2.clientWidth / W2; tp.style.left = Math.min(el2.clientWidth - 200, xs(Math.min(6, Math.max(0.2, d.x))) * k + 10) + "px"; tp.style.top = Math.max(0, ys(d.d) * k - 60) + "px"; })
+    .on("mouseleave", () => { tp.hidden = true; });
+  $("nf-theat-note").textContent = `${th.n} 部上過 Netflix 全球電影榜的好萊塢院線片。院線在台灣越超常，上 Netflix 後在台灣榜也比全球榜待得越久（相關係數 r = ${th.r}，p = ${th.p}）。`;
+  const li = (t, extra) => `<li>${esc(t)}${extra}</li>`;
+  $("nf-local").innerHTML = N.local_hits.slice(0, 8).map(d => li(d.t, `<span class="tag">${d.o}・${d.cat}</span><span>${d.w} 週</span>`)).join("");
+  $("nf-longer").innerHTML = N.longer_tw.slice(0, 8).map(d => li(d.t, `<span>台灣 ${d.tw} 週・全球 ${d.g} 週</span>`)).join("");
+  $("nf-missed").innerHTML = N.missed.slice(0, 8).map(d => li(d.t, `<span>全球 ${d.g} 週</span>`)).join("");
+  const lagMax = Math.max(...N.lag.map(d => d.lag));
+  $("nf-lag").innerHTML = N.lag.map(d => `<div class="hb"><span class="lab">${d.d}<small>${d.n}</small></span>${bar(d.lag, lagMax, "var(--hi)")}<span class="v">${d.lag} 天</span></div>`).join("");
+  const TC = N.tw_content;
+  $("nf-twc").innerHTML = `台灣榜上有 <b>${TC.n}</b> 部台灣作品，其中 <b>${TC.abroad}</b> 部也登上其他國家的前十名。最常出現的市場：${TC.markets.map(d => `${d.c}（${d.n} 部）`).join("、")}。`;
+  $("nf-twc-top").innerHTML = TC.top.map(d => li(d.t, `<span>台灣 ${d.w} 週${d.g ? "・曾上全球榜" : ""}</span>`)).join("");
+}
+document.querySelectorAll("#nf-seg button").forEach(b => b.addEventListener("click", () => {
+  nfKey = b.dataset.k; document.querySelectorAll("#nf-seg button").forEach(x => x.setAttribute("aria-pressed", x === b)); drawNetflix();
+}));
+
+function drawAll() { drawScatter(); drawDetail(); drawTable(); drawWhy(); drawNetflix(); drawWeeks(); drawCtd(); }
+drawAll();
+let rt; new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { drawScatter(); drawNetflix(); drawWeeks(); drawCtd(); }, 120); }).observe(document.querySelector(".wrap"));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll);
+new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+
+</body>
+</html>
